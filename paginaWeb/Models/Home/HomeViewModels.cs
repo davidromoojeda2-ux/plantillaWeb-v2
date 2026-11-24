@@ -110,7 +110,15 @@ public sealed record SectionHeaderViewModel(
 public sealed record HeroViewModel(
     string Title,
     string Subtitle,
-    IReadOnlyList<FeatureCardViewModel> Cards);
+    IReadOnlyList<FeatureCardViewModel> Cards,
+    string? Eyebrow = null)
+{
+    /// <summary>Artículo principal del bloque de destacados.</summary>
+    public FeatureCardViewModel? Lead => Cards.Count > 0 ? Cards[0] : null;
+
+    /// <summary>Resto de destacados, mostrados como lista compacta junto al principal.</summary>
+    public IReadOnlyList<FeatureCardViewModel> Secondary => Cards.Skip(1).ToList();
+}
 
 /// <summary>Tarjeta temática del mosaico Bento para la sección de categorías.</summary>
 public sealed record CategoryBentoCardViewModel(
@@ -132,7 +140,21 @@ public sealed record CategorySectionViewModel(
     CategoryBentoCardViewModel? SubCardLeft,
     CategoryBentoCardViewModel? SubCardRightTop,
     CategoryBentoCardViewModel? SubCardRightBottom,
-    IReadOnlyList<CategoryResponseDto> AllCategories);
+    IReadOnlyList<CategoryResponseDto> AllCategories)
+{
+    /// <summary>Tarjetas de categoría en orden de relevancia, sin huecos.</summary>
+    public IReadOnlyList<CategoryBentoCardViewModel> Cards =>
+        new[] { MainCard, SubCardRightBottom, SubCardRightTop, SubCardLeft }
+            .OfType<CategoryBentoCardViewModel>()
+            .ToList();
+
+    /// <summary>Categorías raíz activas para la franja de accesos rápidos.</summary>
+    public IReadOnlyList<CategoryResponseDto> MainCategories =>
+        AllCategories
+            .Where(c => string.IsNullOrEmpty(c.ParentId))
+            .OrderBy(c => c.Order)
+            .ToList();
+}
 
 /// <summary>
 /// Sección editorial persuasiva con métricas en tiempo real del catálogo (artículos y categorías).
@@ -186,8 +208,9 @@ public static class HomePageViewModelFactory
             .Take(ArticleDisplayLimits.HeroFeaturedLimit)
             .ToList();
         var hero = new HeroViewModel(
-            Title: SiteBrand.Name,
-            Subtitle: "Información completa para producir, almacenar y aprovechar tu propia energía y alcanzar la autonomía energética.",
+            Title: "Produce, almacena y aprovecha tu propia energía",
+            Subtitle: "Guías, noticias y análisis sobre placas solares, baterías y autoconsumo para ahorrar y ganar autonomía energética.",
+            Eyebrow: SiteBrand.Name,
             Cards: heroSource.Select(a => new FeatureCardViewModel(
                 a.Title,
                 a.Summary,
@@ -198,11 +221,20 @@ public static class HomePageViewModelFactory
                 a.Author,
                 a.ReadingTimeMinutes > 0 ? a.ReadingTimeMinutes : EstimateReadingMinutes(a.Summary))).ToList());
 
-        // 2. Últimas entradas en dos columnas (4 publicaciones recientes a la izquierda y 5 más leídas a la derecha)
-        var latestEntriesSource = recent.Concat(featured)
-            .DistinctBy(a => a.Id)
+        // 2. Últimas entradas: no repiten los artículos ya mostrados en destacados.
+        //    Solo si no hay suficientes artículos nuevos se completan con los restantes.
+        var heroIds = heroSource.Select(a => a.Id).ToHashSet();
+        var entryPool = recent.Concat(featured).DistinctBy(a => a.Id).ToList();
+        var latestEntriesSource = entryPool
+            .Where(a => !heroIds.Contains(a.Id))
             .Take(ColumnEntryCount)
             .ToList();
+        if (latestEntriesSource.Count < ColumnEntryCount)
+        {
+            latestEntriesSource.AddRange(entryPool
+                .Where(a => latestEntriesSource.All(l => l.Id != a.Id))
+                .Take(ColumnEntryCount - latestEntriesSource.Count));
+        }
 
         var mostReadList = (mostRead != null && mostRead.Count > 0)
             ? mostRead.ToList()
@@ -238,7 +270,7 @@ public static class HomePageViewModelFactory
         var entriesHeader = new SectionHeaderViewModel(
             HeadingId: "ultimas-entradas-title",
             Title: "Últimas entradas",
-            Subtitle: "Las publicaciones más recientes y los artículos más leídos de nuestra redacción",
+            Subtitle: "Lo más reciente de nuestra redacción.",
             LinkText: "Ver todas",
             LinkHref: searchHref);
 
@@ -264,8 +296,7 @@ public static class HomePageViewModelFactory
         CategoryBentoCardViewModel? BuildCard(
             CategoryResponseDto? cat,
             bool isMain,
-            IReadOnlyList<CategoryResponseDto> subs,
-            string fallbackDesc)
+            IReadOnlyList<CategoryResponseDto> subs)
         {
             if (cat == null || string.IsNullOrEmpty(cat.Id)) return null;
             if (!usedCategoryIds.Add(cat.Id)) return null; // ya usado → no mostrar
@@ -273,7 +304,7 @@ public static class HomePageViewModelFactory
             return new CategoryBentoCardViewModel(
                 Name: cat.Name,
                 Slug: cat.Slug,
-                Description: cat.Description ?? fallbackDesc,
+                Description: string.IsNullOrWhiteSpace(cat.Description) ? null : cat.Description,
                 IsMainCategory: isMain,
                 ParentName: isMain ? null : allCategories.FirstOrDefault(p => p.Id == cat.ParentId)?.Name,
                 ParentSlug: isMain ? null : allCategories.FirstOrDefault(p => p.Id == cat.ParentId)?.Slug,
@@ -293,7 +324,7 @@ public static class HomePageViewModelFactory
         var mainSubs1 = mainCatByArticles != null
             ? allCategories.Where(c => c.ParentId == mainCatByArticles.Id && c.IsActive).OrderBy(c => c.Order).ToList()
             : new List<CategoryResponseDto>();
-        var mainBentoCard = BuildCard(mainCatByArticles, true, mainSubs1, "Área temática principal del sitio.");
+        var mainBentoCard = BuildCard(mainCatByArticles, true, mainSubs1);
 
         // ── SLOT SubCardRightBottom (bottom-right grande): cat principal MÁS VISITADA ─
         var mainCatByViews = mainCategories
@@ -306,30 +337,30 @@ public static class HomePageViewModelFactory
         var subCardRightBottom = BuildCard(
             mainCatByViews,
             string.IsNullOrEmpty(mainCatByViews?.ParentId),
-            mainSubs2,
-            "Categoría destacada del sitio.");
+            mainSubs2);
 
         // ── SLOT SubCardRightTop (top-right compacto): subcategoría MÁS VISITADA ─────
-        var subCatByViews = allSubs
-            .Where(c => !usedCategoryIds.Contains(c.Id))
-            .OrderByDescending(c => CatViewCount(c.Id)).ThenBy(c => c.Order)
-            .FirstOrDefault();
+        //    Si no hay subcategorías, el hueco se completa con otra categoría principal.
+        CategoryResponseDto? NextUnused(IEnumerable<CategoryResponseDto> source, Func<CategoryResponseDto, long> metric) =>
+            source
+                .Where(c => !usedCategoryIds.Contains(c.Id))
+                .OrderByDescending(metric).ThenBy(c => c.Order)
+                .FirstOrDefault();
+
+        var subCatByViews = NextUnused(allSubs, c => CatViewCount(c.Id))
+                            ?? NextUnused(mainCategories, c => CatViewCount(c.Id));
         var subCardRightTop = BuildCard(
             subCatByViews,
-            false,
-            Array.Empty<CategoryResponseDto>(),
-            "Especialidad destacada.");
+            string.IsNullOrEmpty(subCatByViews?.ParentId),
+            Array.Empty<CategoryResponseDto>());
 
         // ── SLOT SubCardLeft (bottom-left compacto): subcategoría con MÁS ARTÍCULOS ──
-        var subCatByArticles = allSubs
-            .Where(c => !usedCategoryIds.Contains(c.Id))
-            .OrderByDescending(c => CatArticleCount(c.Id)).ThenBy(c => c.Order)
-            .FirstOrDefault();
+        var subCatByArticles = NextUnused(allSubs, c => CatArticleCount(c.Id))
+                               ?? NextUnused(mainCategories, c => CatArticleCount(c.Id));
         var subCardLeft = BuildCard(
             subCatByArticles,
-            false,
-            Array.Empty<CategoryResponseDto>(),
-            "Especialidad con amplia cobertura.");
+            string.IsNullOrEmpty(subCatByArticles?.ParentId),
+            Array.Empty<CategoryResponseDto>());
 
         var activeCategories = allCategories.Where(c => c.IsActive).ToList();
         var subCategoriesCount = activeCategories.Count(c => !string.IsNullOrEmpty(c.ParentId));
@@ -337,7 +368,7 @@ public static class HomePageViewModelFactory
 
         var categorySection = new CategorySectionViewModel(
             Title: "Categorías principales",
-            Subtitle: "Revisa las áreas temáticas más importantes de nuestro sitio web y sus especialidades.",
+            Subtitle: "Las áreas temáticas con más contenido y sus especialidades.",
             MainCard: mainBentoCard,
             SubCardLeft: subCardLeft,
             SubCardRightTop: subCardRightTop,
@@ -345,8 +376,8 @@ public static class HomePageViewModelFactory
             AllCategories: activeCategories);
 
         var textoPersuasivo = new textPersuasivSectionViewModel(
-            Title: "Explora nuestros artículos por categoría",
-            HighlightText: "y encuentra la información que buscas.",
+            Title: "Un archivo que crece contigo",
+            HighlightText: "Contenido práctico, ordenado por temas y actualizado de forma continua.",
             TotalArticles: publishedArticlesCount,
             TotalCategories: mainCategories.Count,
             TotalSubcategories: subCategoriesCount

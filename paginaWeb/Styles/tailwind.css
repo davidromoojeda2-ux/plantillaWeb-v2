@@ -232,5 +232,6 @@
 @import "./components/navbar.css";
 @import "./components/article-prose.css";
 @import "./components/home.css";
+@import "./components/home-landing.css";
 @import "./components/editor.css";
 @import "./components/site-preferences.css";

@@ -11,7 +11,7 @@
         <label for="@inputId" class="sr-only">Buscar noticias</label>
         <input id="@inputId" class="@(vm.InputClass ?? "hero__search-input")" type="search" name="q" value="@vm.Query"
                placeholder="@vm.Placeholder" autocomplete="off" />
-        <button id="hero-search-btn" type="submit" class="@(vm.ButtonClass ?? "btn btn--accent")">Buscar</button>
+        <button id="@(vm.InputId is null ? "hero-search-btn" : inputId + "-btn")" type="submit" class="@(vm.ButtonClass ?? "btn btn--accent")">Buscar</button>
     </form>
 }
 else
