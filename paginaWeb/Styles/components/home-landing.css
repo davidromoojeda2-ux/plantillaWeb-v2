@@ -6,8 +6,9 @@
 
 @layer components {
 
-    .hp {
-        /* Paleta plana de la home */
+    /* Tokens globales del sistema plano: los reutilizan la home y el resto de vistas públicas */
+    :root {
+        /* Paleta plana */
         --hp-navy: var(--color-brand-900);
         --hp-navy-2: var(--color-brand-700);
         --hp-blue: var(--color-brand-500);
@@ -30,7 +31,9 @@
         --hp-fs-h2-xl: clamp(2.25rem, 4.6vw, 3.75rem);
         --hp-fs-h3: clamp(1.125rem, 1.2vw + 0.6rem, 1.375rem);
         --hp-fs-lead: clamp(1.0625rem, 0.6vw + 0.85rem, 1.25rem);
+    }
 
+    .hp {
         background: var(--hp-white);
         color: var(--hp-ink);
     }
@@ -597,15 +600,245 @@
         color: var(--hp-navy);
     }
 
+    /* ======================================================================
+       Páginas públicas (Categoría, Publicaciones, Info): mismo sistema plano
+       ====================================================================== */
+
+    .public-page { background: var(--hp-white); color: var(--hp-ink); }
+
+    /* ─── Cabecera de página: navy sólido, título display, sin brillos ──── */
+    .page-hero {
+        background: var(--hp-navy);
+        color: var(--hp-white);
+        padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+    }
+
+    .page-hero__glow { display: none; }
+
+    .page-hero__inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+
+    .page-hero__breadcrumb {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgb(255 255 255 / 0.72);
+    }
+
+    .page-hero__breadcrumb a { color: rgb(255 255 255 / 0.86); }
+    .page-hero__breadcrumb a:hover { color: var(--hp-accent); text-decoration: underline; text-underline-offset: 0.2em; }
+    .page-hero__breadcrumb-current { color: var(--hp-accent); }
+
+    .page-hero__title {
+        margin: 0;
+        font-size: clamp(2.25rem, 5.4vw, 4.5rem);
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: var(--hp-white);
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+    }
+
+    .page-hero__subtitle {
+        margin: 0;
+        max-width: 44rem;
+        font-size: var(--hp-fs-lead);
+        line-height: 1.55;
+        color: rgb(255 255 255 / 0.86);
+    }
+
+    .page-hero__count {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgb(255 255 255 / 0.8);
+    }
+
+    .page-hero__count strong { color: var(--hp-accent); }
+
+    .page-hero__meta {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--hp-accent);
+    }
+
+    .page-hero__layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+        align-items: end;
+    }
+
+    @media (min-width: 1024px) {
+        .page-hero__layout:has(.page-hero__aside) { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 4rem; }
+    }
+
+    .page-hero__content { display: grid; gap: 1rem; min-width: 0; }
+
+    .page-hero__aside {
+        display: grid;
+        gap: 0.75rem;
+        min-width: 0;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgb(255 255 255 / 0.24);
+    }
+
+    @media (min-width: 1024px) {
+        .page-hero__aside { padding: 0 0 0 2rem; border-top: 0; border-left: 2px solid rgb(255 255 255 / 0.24); }
+    }
+
+    .page-hero__aside-title {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgb(255 255 255 / 0.72);
+    }
+
+    .page-hero__sublist { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+
+    .page-hero__sublink {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.5rem;
+        padding: 0 1rem;
+        border: 1px solid rgb(255 255 255 / 0.5);
+        border-radius: 2px;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--hp-white);
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .page-hero__sublink:hover { background: var(--hp-white); border-color: var(--hp-white); color: var(--hp-navy); }
+
+    .page-hero__sublink--active,
+    .page-hero__sublink--active:hover { background: var(--hp-accent); border-color: var(--hp-accent); color: var(--hp-navy); }
+
+    /* Buscador de cabecera (variante no-hero de _SearchBar) */
+    .page-hero__search-box { display: grid; gap: 0.75rem; width: 100%; max-width: 40rem; }
+    .page-hero__search-form { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .page-hero__search-input {
+        flex: 1 1 14rem;
+        min-height: 3rem;
+        padding: 0 1rem;
+        border: 2px solid var(--hp-white);
+        border-radius: 2px;
+        background: var(--hp-white);
+        font: 500 1rem var(--font-body);
+        color: var(--hp-ink);
+    }
+
+    .page-hero__search-input:focus { outline: 3px solid var(--hp-accent); outline-offset: 2px; }
+
+    .page-hero__search-btn,
+    .page-hero__clear-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3rem;
+        padding: 0 1.5rem;
+        border-radius: 2px;
+        font: 800 0.8125rem/1 var(--font-body);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .page-hero__search-btn { border: 2px solid var(--hp-accent); background: var(--hp-accent); color: var(--hp-navy); }
+    .page-hero__search-btn:hover { background: var(--hp-white); border-color: var(--hp-white); }
+    .page-hero__clear-btn { border: 2px solid var(--hp-white); background: transparent; color: var(--hp-white); }
+    .page-hero__clear-btn:hover { background: var(--hp-white); color: var(--hp-navy); }
+
+    /* ─── Contenido de página ───────────────────────────────────────────── */
+    .page-content-section { padding-block: clamp(3rem, 6vw, 5rem) var(--hp-section-y); }
+
+    @media (min-width: 1024px) { .hp-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+    .hp-card__excerpt {
+        margin: 0;
+        font-size: 0.9375rem;
+        line-height: 1.55;
+        color: var(--hp-muted);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .hp-card__fallback {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        color: var(--hp-blue);
+        background: var(--hp-tint);
+    }
+
+    /* Estado vacío */
+    .hp-empty {
+        display: grid;
+        justify-items: center;
+        gap: 1rem;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+        text-align: center;
+        background: var(--hp-surface);
+        border-radius: var(--hp-radius);
+    }
+
+    .hp-empty__title { margin: 0; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; color: var(--hp-navy); }
+    .hp-empty__text { margin: 0; color: var(--hp-muted); }
+
+    /* ─── Paginación ───────────────────────────────────────────────────── */
+    .pagination-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding-top: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    .pagination-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        padding: 0 1rem;
+        border-radius: 2px;
+        font-size: 0.8125rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pagination-btn--page { min-width: 2.75rem; padding: 0; }
+    .pagination-btn--default { background: var(--hp-white); border: 2px solid var(--hp-line); color: var(--hp-navy); }
+    .pagination-btn--default:hover { border-color: var(--hp-navy); color: var(--hp-navy); }
+    .pagination-btn--active { background: var(--hp-navy); border: 2px solid var(--hp-navy); color: var(--hp-white); }
+    .pagination-btn--active:hover { color: var(--hp-white); }
+    .pagination-btn--ellipsis { background: transparent; border: 0; color: var(--hp-muted); cursor: default; user-select: none; }
+
     /* ─── Movimiento reducido ───────────────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
-        .hp *,
-        .hp *::before,
-        .hp *::after { transition: none !important; }
-        .hp img { transform: none !important; }
+        :is(.hp, .public-page) *,
+        :is(.hp, .public-page) *::before,
+        :is(.hp, .public-page) *::after { transition: none !important; }
+        :is(.hp, .public-page) img { transform: none !important; }
     }
 }
 
-/* Fuera de capas para ganar a la utilidad `mt-20` del footer: la home termina en un
-   bloque de color a sangre, así que el footer va pegado sin franja intermedia. */
-main:has(> .hp) + footer { margin-top: 0; }
+/* Fuera de capas para ganar a la utilidad `mt-20` del footer: home y páginas públicas terminan en un
+   bloque a sangre, así que el footer va pegado sin franja intermedia. */
+main:has(> :is(.hp, .public-page)) + footer { margin-top: 0; }

@@ -48,8 +48,23 @@ Rama: `feat/rediseno-home-ux` · Referencia: prestashop.es (secciones planas, bi
 - Se retira el carrusel (`hero-dynamic.js`) de la home; el resto de páginas no cambia.
 - Test nuevo: las últimas entradas no repiten artículos del bloque de destacados.
 
-## Fuera de alcance (siguiente iteración)
+## Fase 2: resto de vistas públicas
 
-- Cabeceras de Categoría / Publicaciones / Info y la vista de artículo aún usan degradados (`home.css` §18, `Articulo.cshtml`).
-- Limpiar del `home.css` los estilos antiguos de la home (§6, §7, §16–17) cuando se valide el nuevo diseño.
-- Navbar y footer: alinear botones al nuevo sistema rectangular.
+| Vista | Cambio |
+|---|---|
+| Categoría, Publicaciones, Info | Cabecera `page-hero` en navy sólido (sin brillo ni borde amarillo), título display en mayúsculas, subcategorías como etiquetas rectangulares |
+| Publicaciones | Buscador y contador en la cabecera (antes solo se podía buscar desde la home) |
+| Listados | `_PostCardMosaic` pasa a la tarjeta `hp-card` (imagen arriba, texto en superficie sólida); rejilla `hp-grid--3` |
+| Estados vacíos y paginación | Bloque plano `hp-empty` con botón del sistema; paginación rectangular sin sombras |
+| Artículo y parciales | Sin degradados, brillos ni sombras; radios unificados (8px contenedores, 2px botones, etiquetas y campos) |
+| Contenido del artículo | Divisor `hr` sólido y `<mark>` con subrayado sólido (`box-shadow`) en lugar de degradado |
+| Navbar | Cabecera del modal de WhatsApp en color sólido |
+| HTML | Las vistas públicas ya no anidan un segundo `<main>` dentro del layout |
+
+- Los tokens `--hp-*` son globales (`:root`) y `home.css` queda reducido a contenedor, foco y reveal.
+- Se eliminan `hero-dynamic.js` y `_HeroDynamic.cshtml` (carrusel sin uso).
+
+## Fuera de alcance
+
+- Panel de administración (`editor.css` y vistas de `Areas/Admin`).
+- Navbar y footer: solo se retocó el modal de WhatsApp; el botón "Únete" mantiene su estilo.

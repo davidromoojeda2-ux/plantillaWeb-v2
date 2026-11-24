@@ -37,11 +37,11 @@ else
             <div class="page-hero__count" aria-live="polite">
                 @if (isSearch)
                 {
-                    <span>Se encontraron <strong class="text-[#FDC500]">@vm.TotalCount.Value</strong> resultados para "<strong class="text-white">@vm.Query</strong>"</span>
+                    <span>Se encontraron <strong>@vm.TotalCount.Value</strong> resultados para "<strong>@vm.Query</strong>"</span>
                 }
                 else
                 {
-                    <span>Mostrando <strong class="text-[#FDC500]">@vm.TotalCount.Value</strong> publicaciones disponibles</span>
+                    <span>Mostrando <strong>@vm.TotalCount.Value</strong> publicaciones disponibles</span>
                 }
             </div>
         }
