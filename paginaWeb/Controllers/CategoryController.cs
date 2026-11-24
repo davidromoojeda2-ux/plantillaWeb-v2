@@ -74,6 +74,10 @@ public class CategoryController : Controller
 
         var totalPages = (int)Math.Ceiling((double)total / 9);
 
+        // Las categorías no tienen imagen propia: el hero usa la portada del artículo
+        // más reciente de la categoría que tenga imagen.
+        var heroCard = cardItems.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.ImageUrl));
+
         var viewModel = new CategoryPageViewModel(
             Category: category,
             CurrentPage: page,
@@ -81,7 +85,9 @@ public class CategoryController : Controller
             TotalCount: total,
             Articles: cardItems,
             ParentCategory: parentCategory,
-            Subcategories: subcategories);
+            Subcategories: subcategories,
+            HeroImageUrl: heroCard?.ImageUrl,
+            HeroImageSrcSet: heroCard?.ImageSrcSet);
 
         return View(viewModel);
     }

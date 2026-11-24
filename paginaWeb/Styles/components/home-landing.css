@@ -225,10 +225,13 @@
         z-index: -1;
     }
 
+    /* Panel: la imagen principal ocupa todo el contenedor (a sangre, sin margen interior);
+       debajo, el texto del principal y la lista de destacados */
     .hp-featured__panel {
         display: grid;
-        gap: var(--hp-gap);
-        padding: clamp(1rem, 2vw, 1.5rem);
+        grid-template-columns: minmax(0, 1fr);
+        column-gap: var(--hp-gap);
+        overflow: hidden;
         background: var(--hp-white);
         border-radius: var(--hp-radius);
     }
@@ -237,15 +240,29 @@
         .hp-featured__panel { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); }
     }
 
+    .hp-lead,
+    .hp-featured__aside { padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 3vw, 2.5rem); }
+
     .hp-lead { display: grid; gap: 1.5rem; }
 
+    @media (min-width: 1024px) {
+        .hp-lead { padding-right: 0; }
+        .hp-featured__aside { padding-left: var(--hp-gap); }
+    }
+
     .hp-lead__media {
+        grid-column: 1 / -1;
         display: block;
         aspect-ratio: 16 / 9;
         overflow: hidden;
-        border-radius: var(--hp-radius);
         background: var(--hp-surface);
     }
+
+    @media (min-width: 1024px) {
+        .hp-lead__media { aspect-ratio: 21 / 9; }
+    }
+
+    .hp-featured:hover .hp-lead__media img { transform: scale(1.03); }
 
     .hp-lead__media img,
     .hp-card__media img,
@@ -419,7 +436,6 @@
     }
 
     .hp-card:hover img,
-    .hp-lead:hover .hp-lead__media img,
     .hp-mini:hover img,
     .hp-cat-card:hover .hp-cat-card__media img { transform: scale(1.04); }
 
@@ -674,54 +690,31 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr);
         gap: 2rem;
-        align-items: end;
+        align-items: center;
     }
 
+    /* Con imagen: texto a la izquierda, imagen a la derecha */
     @media (min-width: 1024px) {
-        .page-hero__layout:has(.page-hero__aside) { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 4rem; }
+        .page-hero__layout:has(.page-hero__media) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 4rem; }
     }
 
     .page-hero__content { display: grid; gap: 1rem; min-width: 0; }
 
-    .page-hero__aside {
-        display: grid;
-        gap: 0.75rem;
-        min-width: 0;
-        padding-top: 1.5rem;
-        border-top: 2px solid rgb(255 255 255 / 0.24);
+    .page-hero__media {
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border-radius: var(--hp-radius);
+        background: var(--hp-navy-2);
     }
 
-    @media (min-width: 1024px) {
-        .page-hero__aside { padding: 0 0 0 2rem; border-top: 0; border-left: 2px solid rgb(255 255 255 / 0.24); }
-    }
+    .page-hero__media img { width: 100%; height: 100%; object-fit: cover; }
 
-    .page-hero__aside-title {
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: rgb(255 255 255 / 0.72);
-    }
+    /* Franja de subcategorías bajo el hero (reutiliza .hp-strip) */
+    .page-substrip { padding-top: clamp(2rem, 4vw, 3rem); }
+    .page-substrip + .page-content-section { padding-top: clamp(2rem, 4vw, 3rem); }
 
-    .page-hero__sublist { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
-
-    .page-hero__sublink {
-        display: inline-flex;
-        align-items: center;
-        min-height: 2.5rem;
-        padding: 0 1rem;
-        border: 1px solid rgb(255 255 255 / 0.5);
-        border-radius: 2px;
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: var(--hp-white);
-        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .page-hero__sublink:hover { background: var(--hp-white); border-color: var(--hp-white); color: var(--hp-navy); }
-
-    .page-hero__sublink--active,
-    .page-hero__sublink--active:hover { background: var(--hp-accent); border-color: var(--hp-accent); color: var(--hp-navy); }
+    .hp-strip__item--active,
+    .hp-strip__item--active:hover { background: var(--hp-navy); border-color: var(--hp-navy); color: var(--hp-white); }
 
     /* Buscador de cabecera (variante no-hero de _SearchBar) */
     .page-hero__search-box { display: grid; gap: 0.75rem; width: 100%; max-width: 40rem; }

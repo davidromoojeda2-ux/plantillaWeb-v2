@@ -56,16 +56,18 @@
                 <div class="hp-featured__panel">
                     <h2 id="destacados-title" class="sr-only">Artículos destacados</h2>
 
+                    @* La imagen principal ocupa todo el ancho del panel; texto y lista van debajo *@
+                    <a class="hp-lead__media" href="@lead.Href" tabindex="-1" aria-hidden="true">
+                        @if (lead.Image.HasUrl)
+                        {
+                            <img src="@lead.Image.Url" srcset="@lead.Image.SrcSet"
+                                 sizes="(min-width: 1536px) 1400px, 100vw"
+                                 alt="@lead.Image.Alt" width="@lead.Image.Width" height="@lead.Image.Height"
+                                 fetchpriority="high" decoding="async" />
+                        }
+                    </a>
+
                     <article class="hp-lead">
-                        <a class="hp-lead__media" href="@lead.Href" tabindex="-1" aria-hidden="true">
-                            @if (lead.Image.HasUrl)
-                            {
-                                <img src="@lead.Image.Url" srcset="@lead.Image.SrcSet"
-                                     sizes="(min-width: 1024px) 60vw, 100vw"
-                                     alt="@lead.Image.Alt" width="@lead.Image.Width" height="@lead.Image.Height"
-                                     fetchpriority="high" decoding="async" />
-                            }
-                        </a>
                         <div class="hp-lead__body">
                             <span class="hp-eyebrow">@lead.Category</span>
                             <h3 class="hp-lead__title"><a href="@lead.Href">@lead.Title</a></h3>
@@ -290,7 +292,7 @@
     {
         <link rel="preload" as="image" href="@heroLeadImage.Url"
               imagesrcset="@heroLeadImage.SrcSet"
-              imagesizes="(min-width: 1024px) 60vw, 100vw"
+              imagesizes="(min-width: 1536px) 1400px, 100vw"
               fetchpriority="high" />
     }
 }
