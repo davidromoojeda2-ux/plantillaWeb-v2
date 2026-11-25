@@ -1,0 +1,31 @@
+@model FeatureCardViewModel
+
+@* Artículo destacado: imagen completa (sin recorte) + panel navy con categoría, título, fecha y botón.
+   Lo usan los destacados de la home y la cabecera de categoría. *@
+<article class="hp-lead">
+    <a class="hp-lead__media" href="@Model.Href" tabindex="-1" aria-hidden="true">
+        @if (Model.Image.HasUrl)
+        {
+            <img src="@Model.Image.Url" srcset="@Model.Image.SrcSet"
+                 sizes="(min-width: 1024px) 66vw, 100vw"
+                 alt="@Model.Image.Alt" width="@Model.Image.Width" height="@Model.Image.Height"
+                 fetchpriority="high" decoding="async" />
+        }
+    </a>
+    <div class="hp-lead__body">
+        <span class="hp-eyebrow hp-eyebrow--on-dark">@Model.Category</span>
+        <h3 class="hp-lead__title"><a href="@Model.Href">@Model.Title</a></h3>
+        <p class="hp-meta">
+            @if (Model.PublishedAt is DateTime leadDate)
+            {
+                <time datetime="@leadDate.ToString("yyyy-MM-dd")">@leadDate.ToString("dd MMM yyyy")</time>
+                <span aria-hidden="true">·</span>
+            }
+            <span>@Model.ReadingMinutes min de lectura</span>
+        </p>
+        <a class="hp-btn hp-btn--accent" href="@Model.Href" aria-label="Leer artículo: @Model.Title">
+            <span>Leer artículo</span>
+            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+        </a>
+    </div>
+</article>

@@ -19,6 +19,25 @@
         }, { passive: true });
     }
 
+    // 1b. Portada: si la imagen no carga (404, URL rota), se retira el bloque completo
+    //     y el cuerpo queda pegado a la cabecera, igual que un artículo sin portada.
+    function initCoverFallback() {
+        var cover = document.querySelector('.article-cover');
+        var img = cover ? cover.querySelector('img') : null;
+        if (!img) return;
+
+        function removeCover() {
+            if (cover.isConnected) cover.remove();
+        }
+
+        // El error puede haber ocurrido antes de que este script (defer) se ejecute.
+        if (img.complete && img.naturalWidth === 0) {
+            removeCover();
+        } else {
+            img.addEventListener('error', removeCover, { once: true });
+        }
+    }
+
     // 2. Índice Interactivo ("En esta página")
     function initTableOfContents() {
         var body = document.getElementById('articleBody');
@@ -31,18 +50,18 @@
         var headings = body.querySelectorAll('h2, h3');
         if (headings.length === 0) {
             tocs.forEach(function (toc) {
-                toc.innerHTML = '<span class="block px-3 text-blue-100 italic text-sm">Lectura corrida continua</span>';
+                toc.innerHTML = '<span class="toc__empty">Lectura corrida continua</span>';
             });
             var mobileWrapper = document.getElementById('mobileTocWrapper');
             if (mobileWrapper) mobileWrapper.classList.add('hidden');
             return;
         }
 
-        // Clases pensadas para fondo azul marino (#00296B): alto contraste.
-        var activeClasses = ['bg-white/10', 'text-[#FDC500]!', 'border-[#FDC500]!'];
+        // Estilos en home-landing.css (.toc__link): sistema plano sobre fondo blanco.
+        var activeClasses = ['is-active'];
         // La sección padre (H2) de un subtítulo activo queda marcada de forma más tenue.
-        var parentClasses = ['border-[#FDC500]/40!', 'bg-white/5'];
-        var baseClass = 'block border-l-2 border-transparent rounded-r-md py-2 pr-3 leading-relaxed font-body transition-colors duration-200 hover:bg-white/5 hover:text-[#FDC500] focus-visible:outline-2 focus-visible:outline-[#FDC500] ';
+        var parentClasses = ['is-parent'];
+        var baseClass = 'toc__link';
 
         headings.forEach(function (h, idx) {
             // El renderizador de bloques genera ids deterministas; se conservan
@@ -58,8 +77,8 @@
                 var link = document.createElement('a');
                 link.href = '#' + h.id;
                 link.innerText = h.innerText;
-                link.className = baseClass +
-                    (h.tagName === 'H3' ? 'pl-6 text-[15px] font-medium text-blue-50' : 'pl-3 text-[17px] font-semibold text-white');
+                link.className = baseClass + (h.tagName === 'H3' ? ' toc__link--sub' : '');
+
                 link.addEventListener('click', function () {
                     var details = toc.closest('details');
                     if (details) details.open = false;
@@ -269,6 +288,7 @@
     }
 
     function initAll() {
+        initCoverFallback();
         initReadingProgress();
         initTableOfContents();
         initCopyLink();

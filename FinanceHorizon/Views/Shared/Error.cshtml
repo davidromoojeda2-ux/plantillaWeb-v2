@@ -3,21 +3,27 @@
     ViewData["Title"] = "Error";
 }
 
-<section class="mx-auto max-w-3xl px-4 py-20 text-center">
-    <p class="text-sm font-semibold uppercase tracking-widest text-red-600">Error 500</p>
-    <h1 class="mt-3 text-3xl font-bold text-slate-900">No se ha podido procesar tu solicitud</h1>
-    <p class="mt-4 text-base text-slate-600">
-        Ha ocurrido un problema inesperado en el servidor. Vuelve a intentarlo en unos instantes.
-    </p>
+<div class="public-page">
+    <header class="page-hero">
+        <div class="container page-hero__inner">
+            <span class="page-hero__meta">Error 500</span>
+            <h1 class="page-hero__title">No se ha podido procesar tu solicitud</h1>
+            <p class="page-hero__subtitle">
+                Ha ocurrido un problema inesperado en el servidor. Vuelve a intentarlo en unos instantes.
+            </p>
+        </div>
+    </header>
 
-    @if (Model.ShowRequestId)
-    {
-        <p class="mt-6 text-sm text-slate-500">
-            Identificador de la solicitud: <code class="rounded bg-slate-100 px-2 py-1">@Model.RequestId</code>
-        </p>
-    }
-
-    <a href="/" class="mt-8 inline-flex items-center rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700">
-        Volver al inicio
-    </a>
-</section>
+    <section class="container hp-section">
+        @if (Model.ShowRequestId)
+        {
+            <p class="hp-meta" style="margin-bottom: 1.5rem">
+                Identificador de la solicitud: <code>@Model.RequestId</code>
+            </p>
+        }
+        <a href="/" class="hp-btn hp-btn--primary">
+            <span>Volver al inicio</span>
+            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+        </a>
+    </section>
+</div>

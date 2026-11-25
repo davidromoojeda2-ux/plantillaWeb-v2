@@ -11,7 +11,7 @@
 
 <div class="public-page">
     <!-- ─── 1. Cabecera Hero de Extremo a Extremo (Full Width) ───────────────── -->
-    <header class="page-hero">
+    <header class="page-hero category-hero">
 
         <div class="container page-hero__inner">
             <!-- Breadcrumb -->
@@ -33,58 +33,63 @@
                 <span class="page-hero__breadcrumb-current">@Model.Category.Name</span>
             </nav>
 
-            <div class="page-hero__layout">
-                <div class="page-hero__content">
-                    <h1 class="page-hero__title">@Model.Category.Name</h1>
+            @* Categoría centrada arriba; debajo, el artículo más reciente con imagen (imagen + texto a la derecha).
+               Misma composición en categorías y subcategorías. *@
+            <div class="category-hero__intro">
+                <h1 class="page-hero__title">@Model.Category.Name</h1>
 
-                    @if (!string.IsNullOrEmpty(Model.Category.Description))
-                    {
-                        <p class="page-hero__subtitle">@Model.Category.Description</p>
-                    }
-
-                    <div class="page-hero__count">
-                        <span><strong>@Model.TotalCount</strong> publicaciones</span>
-                    </div>
-                </div>
-
-                @if (!string.IsNullOrWhiteSpace(Model.HeroImageUrl))
+                @if (!string.IsNullOrEmpty(Model.Category.Description))
                 {
-                    <div class="page-hero__media">
-                        <img src="@Model.HeroImageUrl" srcset="@Model.HeroImageSrcSet"
-                             sizes="(min-width: 1024px) 40vw, 100vw"
-                             alt="" width="800" height="600"
-                             fetchpriority="high" decoding="async" />
-                    </div>
+                    <p class="page-hero__subtitle">@Model.Category.Description</p>
                 }
+
+                <div class="page-hero__count">
+                    <span><strong>@Model.TotalCount</strong> publicaciones</span>
+                </div>
             </div>
+
+            @if (Model.HeroArticle is not null)
+            {
+                <div class="category-hero__lead">
+                    <partial name="Partials/_LeadArticle" model="Model.HeroArticle" />
+                </div>
+            }
         </div>
     </header>
 
-    @* Subcategorías: franja bajo el hero, solo cuando existen *@
+    @* Subcategorías: menú numerado bajo el hero, solo cuando existen *@
     @if (Model.HasSubcategories)
     {
-        <nav class="hp-strip page-substrip"
+        <nav class="page-submenu"
              aria-label="@(Model.ParentCategory != null ? "Otras subcategorías de " + Model.ParentCategory.Name : "Subcategorías de " + Model.Category.Name)">
             <div class="container">
-                <p class="hp-label">@(Model.ParentCategory != null ? $"Más en {Model.ParentCategory.Name}" : "Subcategorías")</p>
-                <ul class="hp-strip__list">
+                <div class="page-submenu__header">
+                    <p class="hp-label">@(Model.ParentCategory != null ? $"Más en {Model.ParentCategory.Name}" : "Subcategorías")</p>
                     @if (Model.ParentCategory != null)
                     {
-                        <li>
-                            <a class="hp-strip__item" asp-controller="Category" asp-action="Categoria"
-                               asp-route-slug="@Model.ParentCategory.Slug">Todas</a>
-                        </li>
+                        <a class="page-submenu__all" asp-controller="Category" asp-action="Categoria"
+                           asp-route-slug="@Model.ParentCategory.Slug">
+                            <span>Ver todo en @Model.ParentCategory.Name</span>
+                            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                        </a>
                     }
+                </div>
+                <ol class="page-submenu__list" role="list">
+                    @{ var subIndex = 0; }
                     @foreach (var sub in Model.Subcategories!)
                     {
+                        subIndex++;
                         var isCurrent = sub.Slug == Model.Category.Slug;
                         <li>
-                            <a class="hp-strip__item @(isCurrent ? "hp-strip__item--active" : "")"
-                               asp-controller="Category" asp-action="Categoria" asp-route-slug="@sub.Slug"
-                               aria-current="@(isCurrent ? "page" : null)">@sub.Name</a>
+                            <a class="page-submenu__link" asp-controller="Category" asp-action="Categoria" asp-route-slug="@sub.Slug"
+                               aria-current="@(isCurrent ? "page" : null)">
+                                <span class="page-submenu__num" aria-hidden="true">@subIndex.ToString("00")</span>
+                                <span class="page-submenu__name">@sub.Name</span>
+                                <svg class="page-submenu__arrow" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                            </a>
                         </li>
                     }
-                </ul>
+                </ol>
             </div>
         </nav>
     }
@@ -104,16 +109,20 @@
                 }
                 else
                 {
+                    @* El artículo de la cabecera no se repite en la rejilla (GridArticles) *@
+                    @if (Model.GridArticles.Any())
+                    {
                     <ul class="hp-grid hp-grid--3" role="list">
                         @{
                             var cardIndex = 0;
                         }
-                        @foreach (var art in Model.Articles)
+                        @foreach (var art in Model.GridArticles)
                         {
                             ViewData["PostCardPriority"] = cardIndex++ == 0;
                             <partial name="Partials/_PostCard" model="art" />
                         }
                     </ul>
+                    }
 
                     <!-- ─── Paginación Modular Reutilizable ───────────────────────────── -->
                     <partial name="Partials/_Pagination"
@@ -146,6 +155,3 @@
             @JsonLd.Render(breadcrumbJsonLd)
         }
 
-        @section Scripts {
-            <script src="~/js/reveal.js" asp-append-version="true" defer></script>
-        }

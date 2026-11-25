@@ -154,3 +154,16 @@
   }
 }
 
+/* ─── Pantallas muy grandes (≥1920px): escala proporcional ─────────────────
+   El tamaño raíz crece con el viewport (16px a 1920px → máx. 175% del tamaño del
+   navegador) y contenedor/navbar se expresan en rem: todo aumenta en bloque,
+   como un zoom, sin columnas estrechas ni texto diminuto. Solo vistas públicas. */
+@media (min-width: 1920px) {
+  html.site-public {
+    font-size: clamp(100%, 0.8333vw, 175%);
+    --container-max: 100rem;
+    --container-pad: 3rem;
+    --nav-h: 4.25rem;
+    --nav-tap-min: 2.75rem;
+  }
+}

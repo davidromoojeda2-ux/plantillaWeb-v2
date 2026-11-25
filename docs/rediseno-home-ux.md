@@ -67,4 +67,23 @@ Rama: `feat/rediseno-home-ux` · Referencia: prestashop.es (secciones planas, bi
 ## Fuera de alcance
 
 - Panel de administración (`editor.css` y vistas de `Areas/Admin`).
-- Navbar y footer: solo se retocó el modal de WhatsApp; el botón "Únete" mantiene su estilo.
+
+## Fase 3: navbar y footer
+
+| Pieza | Cambio |
+|---|---|
+| Navbar | Fondo blanco sólido con línea inferior de 1px (sin blur ni sombra al hacer scroll); ancho alineado con `.container`; enlaces en mayúsculas 800 con subrayado amarillo recto pegado a la línea |
+| Botón "Únete" | Formato de `.hp-btn` (rectangular, 2px, mayúsculas, sin sombra ni escalado) conservando el verde WhatsApp |
+| Mega-menú y menú móvil | Franja amarilla plana sin sombra; encabezados con borde navy, marcadores cuadrados, sin desplazamientos al hover |
+| Modal de WhatsApp | Contenedor de 8px sin sombra ni blur; controles y elementos de 2px; tipografía del sistema |
+| Destacado principal (home) | Dinámico (imagen del destacado más reciente, sin carrusel). Imagen completa sin recorte (`object-fit: contain`) junto a un panel navy con categoría, título, fecha y "Leer artículo"; "También destacado" pasa a una fila de 4 debajo |
+| Franja de categorías | Tarjetas más altas y separadas en escritorio; en móvil se apilan en vertical (2 columnas en tablet). La página de categoría ya no la usa |
+| Hero de categoría y subcategoría | Título, descripción y contador centrados arriba; debajo, el artículo más reciente con imagen mediante el componente común `Partials/_LeadArticle` (imagen completa + panel con el texto a la derecha), el mismo que los destacados de la home. `CategoryPageViewModel.HeroArticle` sustituye a `HeroImageUrl`/`HeroImageSrcSet`. El artículo destacado no se repite en la rejilla (`GridArticles` excluye `HeroArticleId`; `Articles` sigue completo para los datos estructurados) |
+| Subcategorías | Menú numerado (01, 02…) bajo el hero con filetes navy, la actual resaltada en navy y "Ver todo en …" en subcategorías; solo aparece si existen |
+| Artículo | Cabecera navy (`page-hero` + `article-hero__*`): migas, anterior/siguiente, categoría, título en mayúsculas, resumen, autor y datos. Barra de compartir solo con iconos cuadrados (`share-bar`) al pie de la cabecera, antes de la portada. Cabecera centrada. Portada completa sin recorte, sobre la frontera navy / blanco con corte recto (franja navy sólida detrás de la parte alta, como los destacados de la home; sin degradado). Contenido y comentarios sobre blanco, sin tarjetas |
+| Índice del artículo | "En esta página" sin caja navy: filete navy arriba, título en mayúsculas, contador, enlaces con filete lateral y la sección activa en tinte azul con filete amarillo (`.toc*`, clases asignadas por `article.js`). En móvil, plegable entre filetes navy |
+| Tarjeta de artículo única | `Partials/_PostCard` → `_PostCardMosaic` (`hp-card`) es el único componente de tarjeta: home ("Últimas entradas", antes duplicada en línea), publicaciones, categorías y "También te puede interesar". `PostCardViewModel` añade `ShowExcerpt` y `ImageSizes` (`SizesFourColumns` / `SizesThreeColumns`). `reveal.js` se carga una vez en el layout en lugar de por página |
+| También te puede interesar | Cabecera de sección `hp-h2` y rejilla `hp-grid--3` con la tarjeta común, sin resumen |
+| Políticas (Info) y error | Menú "Información legal" con el mismo estilo `.toc` que el índice del artículo (página actual resaltada); se eliminan `_MenuBrand` y `_CollapsibleMenuHeader`, ya sin uso. Contenido sin tarjeta con borde; la página de error pasa a cabecera navy con botón del sistema |
+| Pantallas muy grandes (≥1920px) | Escala proporcional solo en vistas públicas (`html.site-public`): tamaño raíz `clamp(100%, 0.8333vw, 175%)` (16px a 1920, ~21px a 2560, 28px a 3840) y contenedor (`100rem`) y navbar en `rem`. Todo crece en bloque como un zoom; el admin no cambia |
+| Footer | Navy sólido con BEM `site-footer__*` (`Styles/components/footer.css`), encabezados amarillos con filete, iconos sociales cuadrados y texto de marca de finanzas |

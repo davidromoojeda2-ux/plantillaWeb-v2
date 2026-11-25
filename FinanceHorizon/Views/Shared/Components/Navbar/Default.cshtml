@@ -29,21 +29,29 @@
                                 </svg>
                             </button>
 
-                            <!-- Mega Menú Horizontal -->
-                            <div class="dropdown mega-menu" id="nav-categorias" role="region" aria-label="Explorar Categorías">
+                            <!-- Mega Menú: franja amarilla con intro + categorías numeradas -->
+                            <div class="dropdown mega-menu" id="nav-categorias" role="region" aria-label="Explorar categorías">
                                 <div class="mega-menu__container">
-                                    <!-- Grid de Columnas Horizontales -->
-                                    <div class="mega-menu__grid">
+                                    <div class="mega-menu__intro">
+                                        <span class="mega-menu__eyebrow">Explorar</span>
+                                        <p class="mega-menu__title">Categorías</p>
+                                        <a class="hp-btn hp-btn--primary mega-menu__cta" asp-controller="Publicaciones" asp-action="Index">
+                                            <span>Ver publicaciones</span>
+                                            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                                        </a>
+                                    </div>
+                            
+                                    <ol class="mega-menu__grid" role="list">
+                                        @{ var catIndex = 0; }
                                         @foreach (var cat in Model.Menu)
                                         {
-                                            <div class="mega-menu__column">
+                                            catIndex++;
+                                            <li class="mega-menu__column">
                                                 <a class="mega-menu__header" asp-controller="Category" asp-action="Categoria"
                                                    asp-route-slug="@cat.Slug">
-                                                    <span>@cat.Name</span>
-                                                    <svg class="mega-menu__arrow" width="12" height="12" viewBox="0 0 24 24"
-                                                         fill="none" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                                    </svg>
+                                                    <span class="mega-menu__num" aria-hidden="true">@catIndex.ToString("00")</span>
+                                                    <span class="mega-menu__name">@cat.Name</span>
+                                                    <svg class="mega-menu__arrow" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
                                                 </a>
                                                 @if (cat.Children.Any())
                                                 {
@@ -52,17 +60,14 @@
                                                         {
                                                             <li>
                                                                 <a class="mega-menu__sublink" asp-controller="Category"
-                                                                   asp-action="Categoria" asp-route-slug="@sub.Slug">
-                                                                    <span class="mega-menu__bullet" aria-hidden="true"></span>
-                                                                    <span>@sub.Name</span>
-                                                                </a>
+                                                                   asp-action="Categoria" asp-route-slug="@sub.Slug">@sub.Name</a>
                                                             </li>
                                                         }
                                                     </ul>
                                                 }
-                                            </div>
+                                            </li>
                                         }
-                                    </div>
+                                    </ol>
                                 </div>
                             </div>
                         </li>
@@ -92,24 +97,24 @@
 
     <!-- ─── Modal público de Grupos de WhatsApp ────────────────────────────────── -->
     <div id="whatsAppGroupsPublicModal"
-         class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4"
+         class="fixed inset-0 z-[80] hidden items-center justify-center bg-[#00296B]/70 p-4"
          role="dialog" aria-modal="true" aria-labelledby="whatsAppGroupsPublicModalTitle">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-lg w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
             <div class="bg-[#075E54] text-white p-5 sm:p-6 flex items-start justify-between gap-4">
                 <div class="flex items-start gap-3.5">
-                    <span class="w-11 h-11 rounded-xl bg-white/15 text-white flex items-center justify-center flex-shrink-0">
+                    <span class="w-11 h-11 rounded-[2px] bg-white/15 text-white flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                         </svg>
                     </span>
                     <div>
-                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[#9FE870]">Comunidad</p>
-                        <h3 id="whatsAppGroupsPublicModalTitle" class="text-lg font-extrabold mt-1 text-white">Únete a nuestros grupos</h3>
-                        <p class="text-xs text-emerald-50/90 mt-1">Elige el grupo de WhatsApp que quieras seguir.</p>
+                        <p class="text-xs font-extrabold uppercase tracking-[0.08em] text-[#9FE870]">Comunidad</p>
+                        <h3 id="whatsAppGroupsPublicModalTitle" class="text-xl font-black uppercase tracking-[-0.02em] leading-tight mt-1.5 text-white">Únete a nuestros grupos</h3>
+                        <p class="text-sm text-emerald-50/90 mt-1.5">Elige el grupo de WhatsApp que quieras seguir.</p>
                     </div>
                 </div>
                 <button type="button" data-close-whatsapp-public
-                        class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition flex-shrink-0"
+                        class="inline-flex items-center justify-center w-11 h-11 rounded-[2px] border-2 border-white/40 hover:bg-white hover:text-[#075E54] text-white transition flex-shrink-0"
                         aria-label="Cerrar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -123,23 +128,23 @@
                     @foreach (var group in Model.WhatsAppGroups)
                     {
                         <a href="@group.Url" target="_blank" rel="noopener noreferrer"
-                           class="flex items-center justify-between gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-[#25D366]/40 hover:bg-[#25D366]/5 transition group">
+                           class="flex items-center justify-between gap-3 p-3.5 rounded-[2px] border-2 border-[#E2E5EA] hover:border-[#075E54] transition group">
                             <span class="flex items-center gap-3 min-w-0">
-                                <span class="w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
+                                <span class="w-9 h-9 rounded-[2px] bg-[#25D366]/10 text-[#25D366] flex items-center justify-center flex-shrink-0">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                                     </svg>
                                 </span>
-                                <span class="font-semibold text-slate-800 text-sm truncate">@group.Name</span>
+                                <span class="font-bold text-[#00296B] text-sm truncate">@group.Name</span>
                             </span>
-                            <span class="text-xs font-bold text-[#128C7E] group-hover:underline flex-shrink-0">Unirme →</span>
+                            <span class="text-xs font-extrabold uppercase tracking-[0.08em] text-[#075E54] group-hover:underline flex-shrink-0">Unirme →</span>
                         </a>
                     }
                 }
                 else
                 {
                     <div class="text-center py-10">
-                        <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-[#25D366] mb-3">
+                        <span class="inline-flex items-center justify-center w-14 h-14 rounded-[2px] bg-emerald-50 text-[#25D366] mb-3">
                             <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                             </svg>

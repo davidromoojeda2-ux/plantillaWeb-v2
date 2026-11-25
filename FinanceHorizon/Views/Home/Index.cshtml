@@ -56,43 +56,7 @@
                 <div class="hp-featured__panel">
                     <h2 id="destacados-title" class="sr-only">Artículos destacados</h2>
 
-                    @* La imagen principal ocupa todo el ancho del panel; texto y lista van debajo *@
-                    <a class="hp-lead__media" href="@lead.Href" tabindex="-1" aria-hidden="true">
-                        @if (lead.Image.HasUrl)
-                        {
-                            <img src="@lead.Image.Url" srcset="@lead.Image.SrcSet"
-                                 sizes="(min-width: 1536px) 1400px, 100vw"
-                                 alt="@lead.Image.Alt" width="@lead.Image.Width" height="@lead.Image.Height"
-                                 fetchpriority="high" decoding="async" />
-                        }
-                    </a>
-
-                    <article class="hp-lead">
-                        <div class="hp-lead__body">
-                            <span class="hp-eyebrow">@lead.Category</span>
-                            <h3 class="hp-lead__title"><a href="@lead.Href">@lead.Title</a></h3>
-                            @if (!string.IsNullOrWhiteSpace(lead.Text))
-                            {
-                                <p class="hp-lead__summary">@lead.Text</p>
-                            }
-                            <p class="hp-meta">
-                                @if (lead.PublishedAt is DateTime leadDate)
-                                {
-                                    <time datetime="@leadDate.ToString("yyyy-MM-dd")">@leadDate.ToString("dd MMM yyyy")</time>
-                                    <span aria-hidden="true">·</span>
-                                }
-                                <span>@lead.ReadingMinutes min de lectura</span>
-                                @if (!string.IsNullOrWhiteSpace(lead.Author))
-                                {
-                                    <span aria-hidden="true">·</span>
-                                    <span>Por @lead.Author</span>
-                                }
-                            </p>
-                            <a class="hp-btn hp-btn--primary" href="@lead.Href" aria-label="Leer artículo: @lead.Title">
-                                <span>Leer artículo</span>@ArrowIcon()
-                            </a>
-                        </div>
-                    </article>
+                    <partial name="Partials/_LeadArticle" model="lead" />
 
                     @if (Model.Hero.Secondary.Count > 0)
                     {
@@ -167,25 +131,7 @@
                 <ul class="hp-grid">
                     @foreach (var entry in Model.LatestEntries)
                     {
-                        <li>
-                            <article class="hp-card">
-                                <div class="hp-card__media">
-                                    @if (entry.Image.HasUrl)
-                                    {
-                                        <img src="@entry.Image.Url" srcset="@entry.Image.SrcSet"
-                                             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                                             alt="@entry.Image.Alt" width="@entry.Image.Width" height="@entry.Image.Height"
-                                             loading="lazy" decoding="async" />
-                                    }
-                                </div>
-                                <span class="hp-eyebrow">@entry.Category</span>
-                                <h3 class="hp-card__title"><a href="@entry.Href">@entry.Title</a></h3>
-                                @if (entry.PublishedAt is DateTime entryDate)
-                                {
-                                    <p class="hp-meta"><time datetime="@entryDate.ToString("yyyy-MM-dd")">@entryDate.ToString("dd MMM yyyy")</time></p>
-                                }
-                            </article>
-                        </li>
+                        <partial name="Partials/_PostCard" model="entry" />
                     }
                 </ul>
             </div>

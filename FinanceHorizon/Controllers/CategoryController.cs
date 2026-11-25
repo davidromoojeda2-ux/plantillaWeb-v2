@@ -4,6 +4,7 @@ using Aplication.Services;
 using Infrastructure.Storage;
 using Microsoft.AspNetCore.Mvc;
 using FinanceHorizon.Models.Category;
+using FinanceHorizon.Models.Home;
 
 namespace FinanceHorizon.Controllers;
 
@@ -74,9 +75,18 @@ public class CategoryController : Controller
 
         var totalPages = (int)Math.Ceiling((double)total / 9);
 
-        // Las categorías no tienen imagen propia: el hero usa la portada del artículo
-        // más reciente de la categoría que tenga imagen.
+        // Las categorías no tienen imagen propia: la cabecera destaca el artículo más
+        // reciente de la categoría que tenga imagen (imagen + texto, como en la home).
         var heroCard = cardItems.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.ImageUrl));
+        var heroArticle = heroCard is null ? null : new FeatureCardViewModel(
+            Title: heroCard.Article.Title,
+            Text: heroCard.Article.Summary ?? string.Empty,
+            Category: heroCard.CategoryName,
+            Href: Url.Action("Articulo", "Home", new { slug = heroCard.Article.Slug }) ?? $"/articulos/{heroCard.Article.Slug}",
+            Image: new CardImage(heroCard.ImageUrl, heroCard.Article.Title, 1600, 900, heroCard.ImageSrcSet),
+            PublishedAt: heroCard.Article.PublishedAt,
+            Author: heroCard.Article.Author,
+            ReadingMinutes: heroCard.Article.ReadingTimeMinutes);
 
         var viewModel = new CategoryPageViewModel(
             Category: category,
@@ -86,8 +96,8 @@ public class CategoryController : Controller
             Articles: cardItems,
             ParentCategory: parentCategory,
             Subcategories: subcategories,
-            HeroImageUrl: heroCard?.ImageUrl,
-            HeroImageSrcSet: heroCard?.ImageSrcSet);
+            HeroArticle: heroArticle,
+            HeroArticleId: heroCard?.Article.Id);
 
         return View(viewModel);
     }

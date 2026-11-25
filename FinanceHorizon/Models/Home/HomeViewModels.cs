@@ -24,7 +24,11 @@ public sealed record FeatureCardViewModel(
     string? Author = null,
     int ReadingMinutes = 3);
 
-/// <summary>Tarjeta de la cuadrícula "Últimas publicaciones" y catálogo general de artículos.</summary>
+/// <summary>
+/// Tarjeta de artículo del sistema plano (<c>Partials/_PostCard</c>): home, publicaciones,
+/// categorías y "También te puede interesar". <paramref name="ShowExcerpt"/> oculta el resumen y
+/// <paramref name="ImageSizes"/> ajusta el atributo <c>sizes</c> al número de columnas de la rejilla.
+/// </summary>
 public sealed record PostCardViewModel(
     string Title,
     string Excerpt,
@@ -35,8 +39,16 @@ public sealed record PostCardViewModel(
     bool AsGridItem = true,
     string? CustomClass = null,
     long ViewCount = 0,
-    int? Rank = null)
+    int? Rank = null,
+    bool ShowExcerpt = true,
+    string? ImageSizes = null)
 {
+    /// <summary>sizes para rejillas de 4 columnas (home).</summary>
+    public const string SizesFourColumns = "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw";
+
+    /// <summary>sizes para rejillas de 3 columnas (listados y recomendados).</summary>
+    public const string SizesThreeColumns = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
+
     public static PostCardViewModel FromArticle(
         FinanceHorizon.Models.Category.ArticleCardViewModel item,
         string? href = null,
@@ -255,7 +267,9 @@ public static class HomePageViewModelFactory
             a.PublishedAt,
             articleHref(a.Slug),
             ResolveImage(a, images),
-            ViewCount: a.ViewCount)).ToList();
+            ViewCount: a.ViewCount,
+            ShowExcerpt: false,
+            ImageSizes: PostCardViewModel.SizesFourColumns)).ToList();
 
         var mostReadEntries = mostReadEntriesSource.Select((a, idx) => new PostCardViewModel(
             a.Title,

@@ -29,9 +29,18 @@ public sealed record CategoryPageViewModel(
     IReadOnlyList<ArticleCardViewModel> Articles,
     CategoryResponseDto? ParentCategory = null,
     IReadOnlyList<CategoryResponseDto>? Subcategories = null,
-    string? HeroImageUrl = null,
-    string? HeroImageSrcSet = null)
+    FinanceHorizon.Models.Home.FeatureCardViewModel? HeroArticle = null,
+    string? HeroArticleId = null)
 {
+    /// <summary>
+    /// Artículos de la rejilla: todos los de la página salvo el que ya se destaca en la cabecera,
+    /// para no repetirlo. <see cref="Articles"/> conserva la lista completa (datos estructurados).
+    /// </summary>
+    public IReadOnlyList<ArticleCardViewModel> GridArticles =>
+        string.IsNullOrEmpty(HeroArticleId)
+            ? Articles
+            : Articles.Where(a => a.Article.Id != HeroArticleId).ToList();
+
     /// <summary>Solo se muestra la franja de subcategorías si hay alguna.</summary>
     public bool HasSubcategories => Subcategories is { Count: > 0 };
 }

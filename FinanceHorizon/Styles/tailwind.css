@@ -230,6 +230,7 @@
 /* ─── Módulos de Componentes Centralizados (Tailwind Single Source) ────────── */
 @import "./components/tokens-compat.css";
 @import "./components/navbar.css";
+@import "./components/footer.css";
 @import "./components/article-prose.css";
 @import "./components/home.css";
 @import "./components/home-landing.css";

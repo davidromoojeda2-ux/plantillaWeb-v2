@@ -48,22 +48,24 @@
     <section class="page-content-section container" aria-label="Contenido">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             <!-- Menú Lateral Institucional (escritorio) -->
-            <aside class="hidden lg:block lg:col-span-4 bg-[#00296B] text-white p-5 rounded-lg space-y-4 sticky top-28 z-10">
-                <h4 class="pb-3 border-b border-white/15">
-                    <partial name="Partials/_MenuBrand" model="institutionalHeader.Title" />
-                </h4>
+            <aside class="toc hidden lg:block lg:col-span-4" aria-labelledby="institutionalTitle">
+                <div class="toc__header">
+                    <h2 class="toc__title" id="institutionalTitle">@institutionalHeader.Title</h2>
+                </div>
                 <partial name="Partials/_InstitutionalNav" model="institutionalNavDesktop" />
             </aside>
 
             <!-- Menú desplegable Institucional (móvil y tablet) -->
-            <details id="institutionalMenu" open
-                     class="lg:hidden lg:col-span-4 group overflow-hidden bg-[#00296B] text-white rounded-lg">
-                <partial name="Partials/_CollapsibleMenuHeader" model="institutionalHeader" />
+            <details id="institutionalMenu" class="toc-mobile lg:hidden" open>
+                <summary class="toc-mobile__summary">
+                    <span class="toc__title">@institutionalHeader.Title</span>
+                    <svg class="toc-mobile__chevron" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M0 2l5 6 5-6z" fill="currentColor" /></svg>
+                </summary>
                 <partial name="Partials/_InstitutionalNav" model="institutionalNavMobile" />
             </details>
 
             <!-- Contenido Estructurado -->
-            <article class="lg:col-span-8 bg-white p-8 sm:p-12 rounded-lg border border-slate-200/90">
+            <article class="lg:col-span-8 min-w-0 lg:pl-4">
                 <div class="article-prose max-w-none">
                     <partial name="Partials/ContentBlocks/_ContentBlocks" model="Model.Blocks" />
                 </div>
