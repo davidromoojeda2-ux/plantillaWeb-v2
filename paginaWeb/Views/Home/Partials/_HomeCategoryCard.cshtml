@@ -1,0 +1,44 @@
+@model CategoryBentoCardViewModel
+@{
+    var label = Model.IsMainCategory
+        ? "Categoría"
+        : string.IsNullOrWhiteSpace(Model.ParentName) ? "Subcategoría" : $"Subcategoría · {Model.ParentName}";
+    var titleId = $"cat-card-{Model.Slug}";
+}
+
+<article class="hp-cat-card" aria-labelledby="@titleId">
+    <div class="hp-cat-card__media">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" srcset="@Model.ImageSrcSet"
+                 sizes="(min-width: 768px) 50vw, 100vw"
+                 alt="" width="800" height="450" loading="lazy" decoding="async" />
+        }
+    </div>
+    <div class="hp-cat-card__body">
+        <span class="hp-eyebrow">@label</span>
+        <h3 class="hp-cat-card__title" id="@titleId">
+            <a asp-controller="Category" asp-action="Categoria" asp-route-slug="@Model.Slug">@Model.Name</a>
+        </h3>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="hp-cat-card__desc">@Model.Description</p>
+        }
+        @if (Model.Subcategories.Any())
+        {
+            <ul class="hp-cat-card__tags" aria-label="Especialidades de @Model.Name">
+                @foreach (var sub in Model.Subcategories)
+                {
+                    <li>
+                        <a class="hp-tag" asp-controller="Category" asp-action="Categoria" asp-route-slug="@sub.Slug">@sub.Name</a>
+                    </li>
+                }
+            </ul>
+        }
+        <a class="hp-btn hp-btn--outline hp-cat-card__cta" asp-controller="Category" asp-action="Categoria"
+           asp-route-slug="@Model.Slug" aria-label="Ver categoría @Model.Name">
+            <span>Ver categoría</span>
+            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+        </a>
+    </div>
+</article>

@@ -173,7 +173,8 @@
 
   .article-prose mark,
   .prose mark {
-    background: linear-gradient(transparent 60%, rgb(253 197 0 / 0.45) 60%);
+    background: transparent;
+    box-shadow: inset 0 -0.4em 0 rgb(253 197 0 / 0.45);
     color: inherit;
     padding: 0 0.1em;
     border-radius: 2px;
@@ -906,7 +907,7 @@
     margin: 3rem 0;
     border: none;
     overflow: visible;
-    background: linear-gradient(to right, transparent, #dfe4ec 15%, #dfe4ec 85%, transparent);
+    background: #dfe4ec;
   }
 
   /* Pequeño rombo amarillo centrado como marca editorial */

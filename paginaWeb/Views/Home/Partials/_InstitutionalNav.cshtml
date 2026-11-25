@@ -13,7 +13,7 @@
     {
         var isActive = pageItem.Slug == Model.CurrentSlug;
         <a asp-controller="Home" asp-action="Info" asp-route-slug="@pageItem.Slug"
-           class="block px-3 py-2 rounded-xl text-sm font-medium transition @(isActive ? "bg-[#FDC500] text-[#00296B] font-bold shadow-xs" : "text-blue-50 hover:bg-white/10")">
+           class="block px-3 py-2 rounded-sm text-sm font-medium transition @(isActive ? "bg-[#FDC500] text-[#00296B] font-bold" : "text-blue-50 hover:bg-white/10")">
             @pageItem.Title
         </a>
     }

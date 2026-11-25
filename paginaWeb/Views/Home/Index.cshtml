@@ -2,432 +2,287 @@
 @{
     ViewData["Title"] = "Noticias de energía solar, baterías y autoconsumo";
     ViewData["MetaDescription"] = "Noticias, guías y análisis sobre energía solar, baterías y autoconsumo. Información práctica para ahorrar y ganar autonomía.";
-    var heroLeadImage = Model.Hero.Cards is { Count: > 0 } ? Model.Hero.Cards[0].Image : null;
+    var lead = Model.Hero.Lead;
+    var heroLeadImage = lead?.Image;
     ViewData["OgImage"] = heroLeadImage?.Url;
+
+    var publicationsHref = Model.EntriesHeader.LinkHref ?? Url.Action("Index", "Publicaciones");
+    var stats = Model.TextoPersuasivo;
+    var categoryCards = Model.CategorySection.Cards;
+    var mainCategories = Model.CategorySection.MainCategories;
+
+    var heroSearch = new paginaWeb.Models.Publicaciones.SearchBarViewModel(
+        IsHeroSearch: true,
+        FormClass: "hp-search",
+        InputClass: "hp-search__input",
+        ButtonClass: "hp-btn hp-btn--accent");
+    var ctaSearch = new paginaWeb.Models.Publicaciones.SearchBarViewModel(
+        IsHeroSearch: true,
+        FormClass: "hp-search hp-search--on-light",
+        InputClass: "hp-search__input",
+        ButtonClass: "hp-btn hp-btn--primary",
+        InputId: "cta-search-input");
 }
 
+@functions {
+    // Flecha sólida de los botones (equivalente al ▶ de la referencia).
+    private static Microsoft.AspNetCore.Html.HtmlString ArrowIcon() => new(
+        "<svg class=\"hp-btn__icon\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M1 0l9 5-9 5z\" fill=\"currentColor\"/></svg>");
+}
 
-<div class="home">
-    <!-- ─── 1. Hero: Título + Barra de búsqueda + Curva ───────────────────────── -->
-    <section class="hero" id="inicio" aria-labelledby="hero-title">
-        <div class="hero__glow" aria-hidden="true"></div>
-
-        <div class="container hero__inner">
-            <div class="hero__intro" data-reveal>
-                <img src="~/img/logos/logo-dark.svg" alt="" class="hero__logo" width="136" height="136"
-                     decoding="async" />
-
-                <h1 id="hero-title" class="hero__title">@Model.Hero.Title</h1>
-                <p class="hero__subtitle">
-                    @{
-                        const string accentPhrase = "autonomía energética.";
-                        var subtitleText = Model.Hero.Subtitle ?? string.Empty;
-                        var accentIdx = subtitleText.IndexOf(accentPhrase, StringComparison.OrdinalIgnoreCase);
-                    }
-                    @if (accentIdx >= 0)
-                    {
-                        @(subtitleText[..accentIdx])
-                        <span class="hero__subtitle--accent">@subtitleText.Substring(accentIdx, accentPhrase.Length)</span>
-                        @(subtitleText[(accentIdx + accentPhrase.Length)..])
-                    }
-                    else
-                    {
-                        @subtitleText
-                    }
-                </p>
-
-                <!-- Componente Parcial de Búsqueda Modular -->
-                <partial name="Partials/_SearchBar"
-                         model="new paginaWeb.Models.Publicaciones.SearchBarViewModel(IsHeroSearch: true)" />
+<div class="home hp">
+    <!-- ─── 1. Hero: propuesta de valor + buscador ─────────────────────────────── -->
+    <section class="hp-hero" id="inicio" aria-labelledby="hero-title">
+        <div class="container hp-hero__inner">
+            <div class="hp-hero__heading">
+                @if (!string.IsNullOrWhiteSpace(Model.Hero.Eyebrow))
+                {
+                    <p class="hp-eyebrow hp-eyebrow--on-dark">@Model.Hero.Eyebrow</p>
+                }
+                <h1 id="hero-title" class="hp-display">@Model.Hero.Title</h1>
             </div>
-
-            <!-- Hero Dinámico y Moderno (Carrusel Showcase de Noticias en Portada) -->
-            <partial name="Partials/Home/_HeroDynamic" model="Model.Hero.Cards" />
+            <div class="hp-hero__aside">
+                <p class="hp-hero__lead">@Model.Hero.Subtitle</p>
+                <partial name="Partials/_SearchBar" model="heroSearch" />
+            </div>
         </div>
-
-        <svg class="hero__curve" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path d="M0 200V150C240 45 480 22 720 22s480 23 720 128v50H0z" />
-        </svg>
     </section>
 
-    <!-- ─── 2. Últimas entradas (Dos columnas: Recientes y Más leídas) ───────── -->
-    <section class="section container" id="ultimas-entradas" aria-labelledby="ultimas-entradas-title">
-        <div class="section-header" data-reveal>
-            <div class="section-header__text">
-                <h2 id="@Model.EntriesHeader.HeadingId" class="section-header__title">@Model.EntriesHeader.Title</h2>
-                @if (!string.IsNullOrWhiteSpace(Model.EntriesHeader.Subtitle))
-                {
-                    <p class="section-header__subtitle">@Model.EntriesHeader.Subtitle</p>
-                }
-            </div>
-            @if (!string.IsNullOrWhiteSpace(Model.EntriesHeader.LinkText) &&
-                 !string.IsNullOrWhiteSpace(Model.EntriesHeader.LinkHref))
-            {
-                <a class="link-arrow" href="@Model.EntriesHeader.LinkHref" id="@(Model.EntriesHeader.HeadingId)-link">
-                    <span>@Model.EntriesHeader.LinkText</span>
-                    <svg class="link-arrow__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                         focusable="false">
-                        <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                              stroke-linejoin="round" />
-                    </svg>
-                </a>
-            }
-        </div>
+    <!-- ─── 2. Destacados: artículo principal + lista ──────────────────────────── -->
+    @if (lead is not null)
+    {
+        <section class="hp-featured" aria-labelledby="destacados-title">
+            <div class="container">
+                <div class="hp-featured__panel">
+                    <h2 id="destacados-title" class="sr-only">Artículos destacados</h2>
 
-        <div class="entries-grid" data-reveal>
-            <!-- ── Columna Izquierda: Publicaciones más recientes ── -->
-            <div class="entries-panel entries-panel--featured">
-                <div class="entries-panel__header">
-                    <span class="entries-panel__tag">
-                        <span class="entries-panel__dot" aria-hidden="true"></span>
-                        <span>Información reciente</span>
-                    </span>
+                    @* La imagen principal ocupa todo el ancho del panel; texto y lista van debajo *@
+                    <a class="hp-lead__media" href="@lead.Href" tabindex="-1" aria-hidden="true">
+                        @if (lead.Image.HasUrl)
+                        {
+                            <img src="@lead.Image.Url" srcset="@lead.Image.SrcSet"
+                                 sizes="(min-width: 1536px) 1400px, 100vw"
+                                 alt="@lead.Image.Alt" width="@lead.Image.Width" height="@lead.Image.Height"
+                                 fetchpriority="high" decoding="async" />
+                        }
+                    </a>
+
+                    <article class="hp-lead">
+                        <div class="hp-lead__body">
+                            <span class="hp-eyebrow">@lead.Category</span>
+                            <h3 class="hp-lead__title"><a href="@lead.Href">@lead.Title</a></h3>
+                            @if (!string.IsNullOrWhiteSpace(lead.Text))
+                            {
+                                <p class="hp-lead__summary">@lead.Text</p>
+                            }
+                            <p class="hp-meta">
+                                @if (lead.PublishedAt is DateTime leadDate)
+                                {
+                                    <time datetime="@leadDate.ToString("yyyy-MM-dd")">@leadDate.ToString("dd MMM yyyy")</time>
+                                    <span aria-hidden="true">·</span>
+                                }
+                                <span>@lead.ReadingMinutes min de lectura</span>
+                                @if (!string.IsNullOrWhiteSpace(lead.Author))
+                                {
+                                    <span aria-hidden="true">·</span>
+                                    <span>Por @lead.Author</span>
+                                }
+                            </p>
+                            <a class="hp-btn hp-btn--primary" href="@lead.Href" aria-label="Leer artículo: @lead.Title">
+                                <span>Leer artículo</span>@ArrowIcon()
+                            </a>
+                        </div>
+                    </article>
+
+                    @if (Model.Hero.Secondary.Count > 0)
+                    {
+                        <div class="hp-featured__aside">
+                            <p class="hp-label">También destacado</p>
+                            <ul class="hp-featured__list">
+                                @foreach (var item in Model.Hero.Secondary)
+                                {
+                                    <li>
+                                        <a class="hp-mini" href="@item.Href">
+                                            <span class="hp-mini__media">
+                                                @if (item.Image.HasUrl)
+                                                {
+                                                    <img src="@item.Image.Url" srcset="@item.Image.SrcSet" sizes="112px"
+                                                         alt="" width="112" height="84" loading="lazy" decoding="async" />
+                                                }
+                                            </span>
+                                            <span class="hp-mini__body">
+                                                <span class="hp-eyebrow">@item.Category</span>
+                                                <span class="hp-mini__title">@item.Title</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
                 </div>
+            </div>
+        </section>
+    }
 
-                <div class="entries-list">
+    <!-- ─── 3. Franja de categorías (accesos rápidos) ──────────────────────────── -->
+    @if (mainCategories.Count > 0)
+    {
+        <nav class="hp-strip" aria-label="Categorías">
+            <div class="container">
+                <ul class="hp-strip__list">
+                    @foreach (var cat in mainCategories)
+                    {
+                        <li>
+                            <a class="hp-strip__item" asp-controller="Category" asp-action="Categoria"
+                               asp-route-slug="@cat.Slug">@cat.Name</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </nav>
+    }
+
+    <!-- ─── 4. Últimas entradas ──────────────────────────────────────────────── -->
+    @if (Model.LatestEntries.Count > 0)
+    {
+        <section class="hp-section" id="ultimas-entradas" aria-labelledby="@Model.EntriesHeader.HeadingId">
+            <div class="container">
+                <header class="hp-section__header">
+                    <div>
+                        <h2 id="@Model.EntriesHeader.HeadingId" class="hp-h2">@Model.EntriesHeader.Title</h2>
+                        @if (!string.IsNullOrWhiteSpace(Model.EntriesHeader.Subtitle))
+                        {
+                            <p class="hp-section__intro">@Model.EntriesHeader.Subtitle</p>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.EntriesHeader.LinkText) && !string.IsNullOrWhiteSpace(publicationsHref))
+                    {
+                        <a class="hp-btn hp-btn--primary" href="@publicationsHref">
+                            <span>@Model.EntriesHeader.LinkText</span>@ArrowIcon()
+                        </a>
+                    }
+                </header>
+
+                <ul class="hp-grid">
                     @foreach (var entry in Model.LatestEntries)
                     {
-                        var cardContent = new EntryCardContentViewModel(entry, FallbackMeta: "Cobertura", ShowViews: false);
-                        <a class="card-h" href="@entry.Href" aria-label="Leer @entry.Title">
-                            <div class="card-h__media">
-                                @if (entry.Image.HasUrl)
+                        <li>
+                            <article class="hp-card">
+                                <div class="hp-card__media">
+                                    @if (entry.Image.HasUrl)
+                                    {
+                                        <img src="@entry.Image.Url" srcset="@entry.Image.SrcSet"
+                                             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                                             alt="@entry.Image.Alt" width="@entry.Image.Width" height="@entry.Image.Height"
+                                             loading="lazy" decoding="async" />
+                                    }
+                                </div>
+                                <span class="hp-eyebrow">@entry.Category</span>
+                                <h3 class="hp-card__title"><a href="@entry.Href">@entry.Title</a></h3>
+                                @if (entry.PublishedAt is DateTime entryDate)
                                 {
-                                    <img class="card-h__img" src="@entry.Image.Url"
-                                         srcset="@entry.Image.SrcSet"
-                                         sizes="(min-width: 1024px) 22vw, 38vw"
-                                         alt="@entry.Image.Alt"
-                                         width="@entry.Image.Width" height="@entry.Image.Height" loading="lazy"
-                                         decoding="async" />
+                                    <p class="hp-meta"><time datetime="@entryDate.ToString("yyyy-MM-dd")">@entryDate.ToString("dd MMM yyyy")</time></p>
                                 }
-                                else
-                                {
-                                    <div class="card-h__fallback">
-                                        <partial name="_SvgIcon"
-                                                 model="@(new SvgIcon("article", "w-6 h-6", StrokeWidth: "1.5"))" />
-                                    </div>
-                                }
-                            </div>
-                            <partial name="Partials/_EntryCardContent" model="cardContent" />
-                        </a>
+                            </article>
+                        </li>
                     }
-                </div>
+                </ul>
             </div>
+        </section>
+    }
 
-            <!-- ── Columna Derecha: Top Más Leídos (Azul Corporativo Base) ── -->
-            <div class="entries-panel entries-panel--popular entries-panel--recent">
-                <div class="entries-panel__header">
-                    <span class="entries-panel__tag">
-                        <span class="entries-panel__dot" aria-hidden="true"></span>
-                        <span>Top Más Leídos</span>
-                    </span>
+    <!-- ─── 5. Lo más leído (bloque de color plano) ───────────────────────────── -->
+    @if (Model.MostReadEntries.Count > 0)
+    {
+        <section class="hp-section hp-section--tint" id="mas-leidos" aria-labelledby="mas-leidos-title">
+            <div class="container hp-split">
+                <div class="hp-split__intro">
+                    <h2 id="mas-leidos-title" class="hp-h2 hp-h2--xl">Lo más leído</h2>
+                    <p class="hp-section__intro">Los artículos que más consultan nuestros lectores.</p>
                 </div>
-
-                <div class="entries-list">
+                <ol class="hp-rank">
                     @foreach (var entry in Model.MostReadEntries)
                     {
-                        var cardContent = new EntryCardContentViewModel(entry, FallbackMeta: "Actualidad", ShowViews: true);
-                        <a class="card-h" href="@entry.Href" aria-label="Leer @entry.Title">
-                            @if (entry.Rank.HasValue)
-                            {
-                                <span class="card-h__rank" aria-hidden="true">@entry.Rank.Value.ToString("D2")</span>
-                            }
-                            <partial name="Partials/_EntryCardContent" model="cardContent" />
-                        </a>
-                    }
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ─── 3. Sección: Texto persuasivo + Estadísticas del catálogo ───────── -->
-    <section class="persuasive-section" aria-labelledby="texto-persuasivo-title">
-        <div class="container">
-            <div class="persuasive-section__inner" data-reveal>
-                <!-- Columna Izquierda: Propuesta de valor persuasiva con tipografía de gran impacto -->
-                <div class="persuasive-section__copy">
-                    <h2 id="texto-persuasivo-title" class="persuasive-section__title">
-                        @Model.TextoPersuasivo.Title
-                        <span class="persuasive-section__highlight">@Model.TextoPersuasivo.HighlightText</span>
-                    </h2>
-                </div>
-
-                @{
-                    var hasSubcategories = Model.TextoPersuasivo.TotalSubcategories > 0;
-                    var statsModifier = hasSubcategories ? string.Empty : "persuasive-stats--2";
-                }
-                <!-- Columna Derecha: Estadísticas en tiempo real de artículos y categorías -->
-                <div class="persuasive-stats @statsModifier" aria-label="Estadísticas del catálogo editorial">
-                    <!-- Métrica Principal: Total de Artículos -->
-                    <div class="persuasive-stat-card persuasive-stat-card--featured">
-                        <span class="persuasive-stat-card__number" data-count-to="@Model.TextoPersuasivo.TotalArticles">@Model.TextoPersuasivo.TotalArticles</span>
-                        <div class="persuasive-stat-card__meta">
-                            <span class="persuasive-stat-card__label">Artículos publicados</span>
-                        </div>
-                    </div>
-
-                    <!-- Métrica Secundaria 1: Categorías Principales -->
-                    <div class="persuasive-stat-card">
-                        <span class="persuasive-stat-card__number" data-count-to="@Model.TextoPersuasivo.TotalCategories">@Model.TextoPersuasivo.TotalCategories</span>
-                        <div class="persuasive-stat-card__meta">
-                            <span class="persuasive-stat-card__label">Categorías</span>
-                        </div>
-                    </div>
-
-                    @if (hasSubcategories)
-                    {
-                        <!-- Métrica Secundaria 2: Especialidades / Subcategorías -->
-                        <div class="persuasive-stat-card">
-                            <span class="persuasive-stat-card__number" data-count-to="@Model.TextoPersuasivo.TotalSubcategories">@Model.TextoPersuasivo.TotalSubcategories</span>
-                            <div class="persuasive-stat-card__meta">
-                                <span class="persuasive-stat-card__label">Especialidades</span>
+                        <li class="hp-rank__item">
+                            <span class="hp-rank__num" aria-hidden="true">@((entry.Rank ?? 0).ToString("D2"))</span>
+                            <div class="hp-rank__body">
+                                <span class="hp-eyebrow">@entry.Category</span>
+                                <a class="hp-rank__title" href="@entry.Href">@entry.Title</a>
+                                @if (entry.ViewCount > 0)
+                                {
+                                    <span class="hp-meta">@entry.ViewCount.ToString("N0") lecturas</span>
+                                }
                             </div>
-                        </div>
+                        </li>
                     }
-                </div>
+                </ol>
             </div>
+        </section>
+    }
+
+    <!-- ─── 6. Cifras del archivo ─────────────────────────────────────────────── -->
+    <section class="hp-section" aria-labelledby="cifras-title">
+        <div class="container">
+            <header class="hp-section__header hp-section__header--stack">
+                <h2 id="cifras-title" class="hp-h2 hp-h2--xl">@stats.Title</h2>
+                <p class="hp-section__intro">@stats.HighlightText</p>
+            </header>
+            <ul class="hp-stats">
+                <li class="hp-stat">
+                    <span class="hp-stat__num">+<span data-count-to="@stats.TotalArticles">@stats.TotalArticles</span></span>
+                    <span class="hp-stat__label">artículos publicados</span>
+                    @if (!string.IsNullOrWhiteSpace(publicationsHref))
+                    {
+                        <a class="hp-btn hp-btn--outline" href="@publicationsHref"><span>Ver publicaciones</span>@ArrowIcon()</a>
+                    }
+                </li>
+                <li class="hp-stat">
+                    <span class="hp-stat__num"><span data-count-to="@stats.TotalCategories">@stats.TotalCategories</span></span>
+                    <span class="hp-stat__label">categorías temáticas</span>
+                    <a class="hp-btn hp-btn--outline" href="#categorias"><span>Explorar categorías</span>@ArrowIcon()</a>
+                </li>
+                @if (stats.TotalSubcategories > 0)
+                {
+                    <li class="hp-stat">
+                        <span class="hp-stat__num"><span data-count-to="@stats.TotalSubcategories">@stats.TotalSubcategories</span></span>
+                        <span class="hp-stat__label">especialidades</span>
+                        <a class="hp-btn hp-btn--outline" href="#buscar"><span>Buscar un tema</span>@ArrowIcon()</a>
+                    </li>
+                }
+            </ul>
         </div>
     </section>
 
-    <!-- ─── 4. Sección: Cards Categorias ─ -->
-    <section class="bento-section" id="temas-interes" aria-labelledby="temas-interes-title">
-        <div class="container">
-            <div class="section-header" data-reveal>
-                <div class="section-header__text">
-                    <h2 id="temas-interes-title" class="section-header__title">@Model.CategorySection.Title</h2>
-                    <p class="section-header__subtitle">@Model.CategorySection.Subtitle</p>
+    <!-- ─── 7. Categorías principales ─────────────────────────────────────────── -->
+    @if (categoryCards.Count > 0)
+    {
+        <section class="hp-section hp-section--surface" id="categorias" aria-labelledby="categorias-title">
+            <div class="container">
+                <header class="hp-section__header">
+                    <div>
+                        <h2 id="categorias-title" class="hp-h2">@Model.CategorySection.Title</h2>
+                        <p class="hp-section__intro">@Model.CategorySection.Subtitle</p>
+                    </div>
+                </header>
+                <div class="hp-cat-grid">
+                    @foreach (var card in categoryCards)
+                    {
+                        <partial name="Partials/_HomeCategoryCard" model="card" />
+                    }
                 </div>
             </div>
+        </section>
+    }
 
-            @{
-                var hasMainCard = Model.CategorySection.MainCard != null;
-                var hasSubLeft = Model.CategorySection.SubCardLeft != null;
-                var hasSubRightTop = Model.CategorySection.SubCardRightTop != null;
-                var hasSubRightBottom = Model.CategorySection.SubCardRightBottom != null;
-                var hasLeftCol = hasMainCard || hasSubLeft;
-                var hasRightCol = hasSubRightTop || hasSubRightBottom;
-            }
-            @if (hasLeftCol || hasRightCol)
-            {
-                <!-- Bento Grid 2 Columnas -->
-                <div class="bento-grid" data-reveal>
-                    @if (hasLeftCol)
-                    {
-                        <!-- ── Columna Izquierda ── -->
-                        <div class="bento-col">
-                            @if (hasMainCard)
-                            {
-                                <!-- Tarjeta Grande Superior: Categoría con más artículos -->
-                                <div
-                                    class="bento-card bento-card--large bento-card--primary @(!string.IsNullOrEmpty(Model.CategorySection.MainCard!.ImageUrl) ? "bento-card--has-bg" : "")">
-                                    @if (!string.IsNullOrEmpty(Model.CategorySection.MainCard!.ImageUrl))
-                                    {
-                                        <div class="bento-card__bg" aria-hidden="true">
-                                            <img class="bento-card__bg-img" src="@Model.CategorySection.MainCard!.ImageUrl"
-                                                 srcset="@Model.CategorySection.MainCard!.ImageSrcSet"
-                                                 sizes="(min-width: 1024px) 50vw, 100vw"
-                                                 alt=""
-                                                 loading="lazy" decoding="async" />
-                                            <div class="bento-card__scrim"></div>
-                                        </div>
-                                    }
-                                    <div class="bento-card__content">
-                                        <div>
-                                            <div class="bento-card__header">
-                                                <div>
-                                                    <span class="bento-card__parent-badge">Categoría Principal</span>
-                                                    <h3 class="bento-card__title">@Model.CategorySection.MainCard!.Name</h3>
-                                                </div>
-                                                <a class="bento-card__link-more" asp-controller="Category" asp-action="Categoria"
-                                                   asp-route-slug="@Model.CategorySection.MainCard!.Slug">
-                                                    <span>Ver más</span>
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(Model.CategorySection.MainCard!.Description))
-                                            {
-                                                <p class="bento-card__desc">@Model.CategorySection.MainCard!.Description</p>
-                                            }
-                                        </div>
-                                        @if (Model.CategorySection.MainCard!.Subcategories.Any())
-                                        {
-                                            <div class="bento-card__tags">
-                                                <span class="bento-card__tags-label">Subcategorías:</span>
-                                                @foreach (var sub in Model.CategorySection.MainCard!.Subcategories)
-                                                {
-                                                    <a class="bento-card__tag" asp-controller="Category" asp-action="Categoria"
-                                                       asp-route-slug="@sub.Slug">
-                                                        <span>@sub.Name</span>
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                             stroke-width="2.5">
-                                                            <path d="M9 5l7 7-7 7" />
-                                                        </svg>
-                                                    </a>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            }
-
-                            @if (hasSubLeft)
-                            {
-                                <!-- Tarjeta Compacta Inferior: Subcategoría con más artículos -->
-                                <div
-                                    class="bento-card bento-card--compact @(!string.IsNullOrEmpty(Model.CategorySection.SubCardLeft!.ImageUrl) ? "bento-card--has-bg" : "")">
-                                    @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardLeft!.ImageUrl))
-                                    {
-                                        <div class="bento-card__bg" aria-hidden="true">
-                                            <img class="bento-card__bg-img" src="@Model.CategorySection.SubCardLeft!.ImageUrl"
-                                                 srcset="@Model.CategorySection.SubCardLeft!.ImageSrcSet"
-                                                 sizes="(min-width: 1024px) 50vw, 100vw"
-                                                 alt=""
-                                                 loading="lazy" decoding="async" />
-                                            <div class="bento-card__scrim"></div>
-                                        </div>
-                                    }
-                                    <div class="bento-card__content">
-                                        <div>
-                                            <div class="bento-card__header">
-                                                <div>
-                                                    <span class="bento-card__parent-badge">Subcategoría</span>
-                                                    <h3 class="bento-card__title">@Model.CategorySection.SubCardLeft!.Name</h3>
-                                                </div>
-                                                <a class="bento-card__link-more bento-card__link-more--outline"
-                                                   asp-controller="Category" asp-action="Categoria"
-                                                   asp-route-slug="@Model.CategorySection.SubCardLeft!.Slug">
-                                                    <span>Explorar</span>
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardLeft!.Description))
-                                            {
-                                                <p class="bento-card__desc">@Model.CategorySection.SubCardLeft!.Description</p>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-
-                    @if (hasRightCol)
-                    {
-                        <!-- ── Columna Derecha ── -->
-                        <div class="bento-col">
-                            @if (hasSubRightTop)
-                            {
-                                <!-- Tarjeta Compacta Superior: Subcategoría más visitada -->
-                                <div
-                                    class="bento-card bento-card--compact @(!string.IsNullOrEmpty(Model.CategorySection.SubCardRightTop!.ImageUrl) ? "bento-card--has-bg" : "")">
-                                    @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardRightTop!.ImageUrl))
-                                    {
-                                        <div class="bento-card__bg" aria-hidden="true">
-                                            <img class="bento-card__bg-img" src="@Model.CategorySection.SubCardRightTop!.ImageUrl"
-                                                 srcset="@Model.CategorySection.SubCardRightTop!.ImageSrcSet"
-                                                 sizes="(min-width: 1024px) 50vw, 100vw"
-                                                 alt="" loading="lazy" decoding="async" />
-                                            <div class="bento-card__scrim"></div>
-                                        </div>
-                                    }
-                                    <div class="bento-card__content">
-                                        <div>
-                                            <div class="bento-card__header">
-                                                <div>
-                                                    <span class="bento-card__parent-badge">Subcategoría</span>
-                                                    <h3 class="bento-card__title">@Model.CategorySection.SubCardRightTop!.Name</h3>
-                                                </div>
-                                                <a class="bento-card__link-more bento-card__link-more--outline"
-                                                   asp-controller="Category" asp-action="Categoria"
-                                                   asp-route-slug="@Model.CategorySection.SubCardRightTop!.Slug">
-                                                    <span>Explorar</span>
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardRightTop!.Description))
-                                            {
-                                                <p class="bento-card__desc">@Model.CategorySection.SubCardRightTop!.Description</p>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (hasSubRightBottom)
-                            {
-                                <!-- Tarjeta Grande Inferior: Categoría más visitada -->
-                                <div
-                                    class="bento-card bento-card--large @(!string.IsNullOrEmpty(Model.CategorySection.SubCardRightBottom!.ImageUrl) ? "bento-card--has-bg" : "")">
-                                    @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardRightBottom!.ImageUrl))
-                                    {
-                                        <div class="bento-card__bg" aria-hidden="true">
-                                            <img class="bento-card__bg-img" src="@Model.CategorySection.SubCardRightBottom!.ImageUrl"
-                                                 srcset="@Model.CategorySection.SubCardRightBottom!.ImageSrcSet"
-                                                 sizes="(min-width: 1024px) 50vw, 100vw"
-                                                 alt="" loading="lazy" decoding="async" />
-                                            <div class="bento-card__scrim"></div>
-                                        </div>
-                                    }
-                                    <div class="bento-card__content">
-                                        <div>
-                                            <div class="bento-card__header">
-                                                <div>
-                                                    <span class="bento-card__parent-badge">
-                                                        @(Model.CategorySection.SubCardRightBottom!.IsMainCategory ? "Categoría Destacada" : "Subcategoría")
-                                                    </span>
-                                                    <h3 class="bento-card__title">@Model.CategorySection.SubCardRightBottom!.Name
-                                                    </h3>
-                                                </div>
-                                                <a class="bento-card__link-more" asp-controller="Category" asp-action="Categoria"
-                                                   asp-route-slug="@Model.CategorySection.SubCardRightBottom!.Slug">
-                                                    <span>Ver más</span>
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(Model.CategorySection.SubCardRightBottom!.Description))
-                                            {
-                                                <p class="bento-card__desc">@Model.CategorySection.SubCardRightBottom!.Description</p>
-                                            }
-                                        </div>
-                                        @if (Model.CategorySection.SubCardRightBottom!.Subcategories.Any())
-                                        {
-                                            <div class="bento-card__tags">
-                                                <span class="bento-card__tags-label">Especialidades:</span>
-                                                @foreach (var sub in Model.CategorySection.SubCardRightBottom!.Subcategories)
-                                                {
-                                                    <a class="bento-card__tag" asp-controller="Category" asp-action="Categoria"
-                                                       asp-route-slug="@sub.Slug">
-                                                        <span>@sub.Name</span>
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                             stroke-width="2.5">
-                                                            <path d="M9 5l7 7-7 7" />
-                                                        </svg>
-                                                    </a>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            }
+    <!-- ─── 8. CTA final ──────────────────────────────────────────────────────── -->
+    <section class="hp-cta" id="buscar" aria-labelledby="cta-title">
+        <div class="container hp-cta__inner">
+            <div>
+                <h2 id="cta-title" class="hp-h2 hp-h2--xl">¿Buscas algo concreto?</h2>
+                <p class="hp-cta__text">Encuentra guías, comparativas y noticias por palabra clave.</p>
+            </div>
+            <partial name="Partials/_SearchBar" model="ctaSearch" />
         </div>
     </section>
 </div>
@@ -437,13 +292,11 @@
     {
         <link rel="preload" as="image" href="@heroLeadImage.Url"
               imagesrcset="@heroLeadImage.SrcSet"
-              imagesizes="(min-width: 1600px) 1600px, 100vw"
+              imagesizes="(min-width: 1536px) 1400px, 100vw"
               fetchpriority="high" />
     }
 }
 
 @section Scripts {
-    <script src="~/js/reveal.js" asp-append-version="true" defer></script>
-    <script src="~/js/hero-dynamic.js" asp-append-version="true" defer></script>
     <script src="~/js/stats-count.js" asp-append-version="true" defer></script>
 }

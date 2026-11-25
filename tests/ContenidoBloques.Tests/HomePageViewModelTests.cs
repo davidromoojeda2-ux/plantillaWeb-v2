@@ -39,6 +39,32 @@ public class HomePageViewModelTests
         Assert.Equal("destacado-1", model.Hero.Cards[0].Title);
     }
 
+    [Fact]
+    public void Las_ultimas_entradas_no_repiten_los_destacados()
+    {
+        var recent = Enumerable.Range(1, 12)
+            .Select(i => Article($"reciente-{i}", DateTime.Today.AddDays(-i)))
+            .ToList();
+
+        var model = CreateModel(recent, []);
+
+        var heroTitles = model.Hero.Cards.Select(c => c.Title).ToHashSet();
+        Assert.Equal(HomePageViewModelFactory.ColumnEntryCount, model.LatestEntries.Count);
+        Assert.DoesNotContain(model.LatestEntries, e => heroTitles.Contains(e.Title));
+    }
+
+    [Fact]
+    public void Las_ultimas_entradas_se_completan_si_no_hay_articulos_nuevos()
+    {
+        var recent = Enumerable.Range(1, 3)
+            .Select(i => Article($"reciente-{i}", DateTime.Today.AddDays(-i)))
+            .ToList();
+
+        var model = CreateModel(recent, []);
+
+        Assert.Equal(3, model.LatestEntries.Count);
+    }
+
     private static HomePageViewModel CreateModel(
         IReadOnlyList<ArticleResponseDto> recent,
         IReadOnlyList<ArticleResponseDto> featured) =>

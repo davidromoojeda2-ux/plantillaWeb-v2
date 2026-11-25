@@ -35,8 +35,8 @@
                asp-route-slug="@Model.Previous.Slug"
                rel="prev"
                aria-label="Artículo anterior: @Model.Previous.Title"
-               class="group relative flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-[#00509D]/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-white shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
-                <div class="w-11 h-11 rounded-full bg-slate-100 group-hover:bg-[#00296B] text-slate-600 group-hover:text-[#FDC500] flex items-center justify-center shrink-0 transition-all duration-300 group-hover:-translate-x-1 shadow-xs">
+               class="group relative flex items-center gap-4 p-4 sm:p-5 rounded-lg border border-slate-200/90 bg-white hover:border-[#00509D]/50 hover:bg-[#F5F6F8] transition-all duration-300 hover:-translate-y-0.5">
+                <div class="w-11 h-11 rounded-full bg-slate-100 group-hover:bg-[#00296B] text-slate-600 group-hover:text-[#FDC500] flex items-center justify-center shrink-0 transition-all duration-300 group-hover:-translate-x-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -59,7 +59,7 @@
                 </div>
                 @if (!string.IsNullOrWhiteSpace(prevUrl))
                 {
-                    <div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-slate-200/60 hidden sm:block">
+                    <div class="w-14 h-14 rounded-sm overflow-hidden shrink-0 border border-slate-200/60 hidden sm:block">
                         <img src="@prevUrl" srcset="@prevSrcSet" sizes="56px" width="56" height="56"
                              loading="lazy" decoding="async" alt="@Model.Previous.Title"
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
@@ -69,7 +69,7 @@
         }
         else
         {
-            <div class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 select-none">
+            <div class="flex items-center gap-4 p-4 sm:p-5 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 select-none">
                 <div class="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-300">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -95,10 +95,10 @@
                asp-route-slug="@Model.Next.Slug"
                rel="next"
                aria-label="Artículo siguiente: @Model.Next.Title"
-               class="group relative flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-[#00509D]/50 hover:bg-gradient-to-l hover:from-blue-50/30 hover:to-white shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-right">
+               class="group relative flex items-center justify-between gap-4 p-4 sm:p-5 rounded-lg border border-slate-200/90 bg-white hover:border-[#00509D]/50 hover:bg-[#F5F6F8] transition-all duration-300 hover:-translate-y-0.5 text-right">
                 @if (!string.IsNullOrWhiteSpace(nextUrl))
                 {
-                    <div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-slate-200/60 hidden sm:block order-first">
+                    <div class="w-14 h-14 rounded-sm overflow-hidden shrink-0 border border-slate-200/60 hidden sm:block order-first">
                         <img src="@nextUrl" srcset="@nextSrcSet" sizes="56px" width="56" height="56"
                              loading="lazy" decoding="async" alt="@Model.Next.Title"
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
@@ -120,7 +120,7 @@
                         <span>@Model.Next.ReadingTimeMinutes min lectura</span>
                     </div>
                 </div>
-                <div class="w-11 h-11 rounded-full bg-slate-100 group-hover:bg-[#00296B] text-slate-600 group-hover:text-[#FDC500] flex items-center justify-center shrink-0 transition-all duration-300 group-hover:translate-x-1 shadow-xs">
+                <div class="w-11 h-11 rounded-full bg-slate-100 group-hover:bg-[#00296B] text-slate-600 group-hover:text-[#FDC500] flex items-center justify-center shrink-0 transition-all duration-300 group-hover:translate-x-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
                     </svg>
@@ -129,7 +129,7 @@
         }
         else
         {
-            <div class="flex items-center justify-end gap-4 p-4 sm:p-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 select-none text-right">
+            <div class="flex items-center justify-end gap-4 p-4 sm:p-5 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 select-none text-right">
                 <div class="flex-1 min-w-0">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Siguiente →</span>
                     <p class="text-xs text-slate-400 mt-0.5">Estás en la publicación más reciente</p>

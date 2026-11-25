@@ -12,7 +12,6 @@
 <div class="public-page">
     <!-- ─── 1. Cabecera Hero de Extremo a Extremo (Full Width) ───────────────── -->
     <header class="page-hero">
-        <div class="page-hero__glow" aria-hidden="true"></div>
 
         <div class="container page-hero__inner">
             <!-- Breadcrumb -->
@@ -40,72 +39,72 @@
 
                     @if (!string.IsNullOrEmpty(Model.Category.Description))
                     {
-                        <p class="page-hero__subtitle">
-                            @Model.Category.Description
-                        </p>
+                        <p class="page-hero__subtitle">@Model.Category.Description</p>
                     }
 
                     <div class="page-hero__count">
-                        <span>Total de publicaciones disponibles: <strong
-                            class="text-[#FDC500]">@Model.TotalCount</strong>
-                            artículos</span>
-                        </div>
+                        <span><strong>@Model.TotalCount</strong> publicaciones</span>
                     </div>
-
-                    <!-- Subcategorías asociadas / hermanas en el margen derecho -->
-                    @if (Model.Subcategories != null && Model.Subcategories.Any())
-                    {
-                        <aside class="page-hero__aside"
-                               aria-label="@(Model.ParentCategory != null ? "Otras subcategorías relacionadas" : "Especialidades y subcategorías")">
-                            <span class="page-hero__aside-title">
-                                @(Model.ParentCategory != null ? "Otras subcategorías relacionadas:" : "Especialidades y Subcategorías:")
-                            </span>
-                            <ul class="page-hero__sublist" role="list">
-                                @if (Model.ParentCategory != null)
-                                {
-                                    <li>
-                                        <a asp-controller="Category" asp-action="Categoria"
-                                           asp-route-slug="@Model.ParentCategory.Slug" class="page-hero__sublink">
-                                            <span>Todas en @Model.ParentCategory.Name</span>
-                                        </a>
-                                    </li>
-                                }
-                                @foreach (var sub in Model.Subcategories)
-                                {
-                                    var isCurrent = sub.Slug == Model.Category.Slug;
-                                    <li>
-                                        <a asp-controller="Category" asp-action="Categoria" asp-route-slug="@sub.Slug"
-                                           class="page-hero__sublink @(isCurrent ? "page-hero__sublink--active" : "")"
-                                           aria-current="@(isCurrent ? "page" : null)">
-                                            <span>@sub.Name</span>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </aside>
-                    }
                 </div>
-            </header>
+
+                @if (!string.IsNullOrWhiteSpace(Model.HeroImageUrl))
+                {
+                    <div class="page-hero__media">
+                        <img src="@Model.HeroImageUrl" srcset="@Model.HeroImageSrcSet"
+                             sizes="(min-width: 1024px) 40vw, 100vw"
+                             alt="" width="800" height="600"
+                             fetchpriority="high" decoding="async" />
+                    </div>
+                }
+            </div>
+        </div>
+    </header>
+
+    @* Subcategorías: franja bajo el hero, solo cuando existen *@
+    @if (Model.HasSubcategories)
+    {
+        <nav class="hp-strip page-substrip"
+             aria-label="@(Model.ParentCategory != null ? "Otras subcategorías de " + Model.ParentCategory.Name : "Subcategorías de " + Model.Category.Name)">
+            <div class="container">
+                <p class="hp-label">@(Model.ParentCategory != null ? $"Más en {Model.ParentCategory.Name}" : "Subcategorías")</p>
+                <ul class="hp-strip__list">
+                    @if (Model.ParentCategory != null)
+                    {
+                        <li>
+                            <a class="hp-strip__item" asp-controller="Category" asp-action="Categoria"
+                               asp-route-slug="@Model.ParentCategory.Slug">Todas</a>
+                        </li>
+                    }
+                    @foreach (var sub in Model.Subcategories!)
+                    {
+                        var isCurrent = sub.Slug == Model.Category.Slug;
+                        <li>
+                            <a class="hp-strip__item @(isCurrent ? "hp-strip__item--active" : "")"
+                               asp-controller="Category" asp-action="Categoria" asp-route-slug="@sub.Slug"
+                               aria-current="@(isCurrent ? "page" : null)">@sub.Name</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </nav>
+    }
 
             <!-- ─── 2. Contenido de Extremo a Extremo (Mismo contenedor de la Home) ─── -->
-            <main class="page-content-section container">
+            <section class="page-content-section container" aria-label="Contenido">
                 @if (!Model.Articles.Any())
                 {
-                    <div
-                        class="bg-white rounded-2xl p-12 sm:p-16 text-center text-slate-500 border border-slate-200/90 shadow-xs max-w-2xl mx-auto my-8">
-                        <partial name="_SvgIcon"
-                                 model="@(new SvgIcon("article", "w-14 h-14 mx-auto text-slate-300 mb-4", StrokeWidth: "1.5"))" />
-                        <h3 class="text-xl font-bold text-[#00296B]">No hay publicaciones en esta categoría todavía</h3>
-                        <p class="text-sm text-slate-500 mt-2">Vuelve pronto para consultar nuevas coberturas e investigaciones.</p>
-                        <a asp-controller="Home" asp-action="Index"
-                           class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#00296B] hover:bg-[#003F88] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm">
-                            Volver al inicio
+                    <div class="hp-empty">
+                        <h2 class="hp-empty__title">Aún no hay publicaciones</h2>
+                        <p class="hp-empty__text">Vuelve pronto para consultar nuevas guías y noticias de esta categoría.</p>
+                        <a asp-controller="Home" asp-action="Index" class="hp-btn hp-btn--primary">
+                            <span>Volver al inicio</span>
+                            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
                         </a>
                     </div>
                 }
                 else
                 {
-                    <ul class="card-grid card-grid--posts" role="list">
+                    <ul class="hp-grid hp-grid--3" role="list">
                         @{
                             var cardIndex = 0;
                         }
@@ -120,7 +119,7 @@
                     <partial name="Partials/_Pagination"
                              model="PaginationViewModel.ForCategory(Model.CurrentPage, Model.TotalPages, Model.Category.Slug)" />
                 }
-            </main>
+            </section>
         </div>
 
         @section StructuredData {

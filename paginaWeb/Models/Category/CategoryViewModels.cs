@@ -28,4 +28,10 @@ public sealed record CategoryPageViewModel(
     long TotalCount,
     IReadOnlyList<ArticleCardViewModel> Articles,
     CategoryResponseDto? ParentCategory = null,
-    IReadOnlyList<CategoryResponseDto>? Subcategories = null);
+    IReadOnlyList<CategoryResponseDto>? Subcategories = null,
+    string? HeroImageUrl = null,
+    string? HeroImageSrcSet = null)
+{
+    /// <summary>Solo se muestra la franja de subcategorías si hay alguna.</summary>
+    public bool HasSubcategories => Subcategories is { Count: > 0 };
+}
