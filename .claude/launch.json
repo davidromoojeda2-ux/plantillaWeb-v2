@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "paginaWeb",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "paginaWeb/paginaWeb.csproj", "--launch-profile", "http"],
+      "port": 5014,
+      "autoPort": false
+    }
+  ]
+}
