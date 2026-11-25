@@ -14,7 +14,7 @@ public sealed record EditorialAuthorProfile(
 /// <summary>
 /// Firmas editoriales del portal. Kely Pantoja firma las secciones de guías por
 /// comunidad, ayudas y subvenciones, ahorro y comunidades de vecinos; el resto
-/// de secciones se atribuyen al Grupo de Redactores de unautonomo.
+/// de secciones se atribuyen al Grupo de Redactores de financehorizon.
 /// </summary>
 public static class EditorialAuthors
 {
@@ -24,9 +24,9 @@ public static class EditorialAuthors
         "Periodista especializada en energía y autoconsumo. Analiza ayudas, subvenciones y trámites para que cada instalación sea rentable, y explica con ejemplos reales cómo ahorrar en la factura o poner de acuerdo a una comunidad de vecinos.");
 
     public static readonly EditorialAuthorProfile EditorialGroup = new(
-        "Grupo de Redactores de unautonomo",
+        "Grupo de Redactores de financehorizon",
         "Equipo editorial",
-        "Equipo de redacción de unautonomo dedicado a la divulgación técnica solar. Contrastamos equipos, precios y experiencias de instalación para ofrecer comparativas y guías prácticas sobre placas, baterías y mantenimiento.");
+        "Equipo de redacción de financehorizon dedicado a la divulgación técnica solar. Contrastamos equipos, precios y experiencias de instalación para ofrecer comparativas y guías prácticas sobre placas, baterías y mantenimiento.");
 
     /// <summary>Slugs de las secciones cuya autoría corresponde a Kely Pantoja.</summary>
     private static readonly HashSet<string> KelyCategorySlugs = new(StringComparer.OrdinalIgnoreCase)

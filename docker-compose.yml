@@ -2,11 +2,11 @@ services:
   # ─── Aplicación Web ASP.NET Core ──────────────────────────────────────────
   # Base de datos: MongoDB Atlas (externa, no requiere contenedor local)
   web:
-    image: ${DOCKER_IMAGE:-ghcr.io/davidromoojeda2-ux/plantillaweb:latest}
+    image: ${DOCKER_IMAGE:-ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: portal_web
+    container_name: financehorizon_web
     restart: unless-stopped
     ports:
       - "${HOST_PORT:-5000}:8080"
@@ -15,26 +15,26 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - Site__BaseUrl=${SITE_BASE_URL:-}
       - MongoDB__ConnectionString=${MONGO_CONNECTION_STRING}
-      - MongoDB__DatabaseName=${MONGO_DB:-portal_noticias}
+      - MongoDB__DatabaseName=${MONGO_DB:-financehorizon}
       - Storage__Provider=${STORAGE_PROVIDER:-Local}
       - LocalStorage__BaseUrl=/uploads
       - CloudflareR2__AccountId=${R2_ACCOUNT_ID:-}
       - CloudflareR2__AccessKeyId=${R2_ACCESS_KEY_ID:-}
       - CloudflareR2__SecretAccessKey=${R2_SECRET_ACCESS_KEY:-}
-      - CloudflareR2__BucketName=${R2_BUCKET_NAME:-portal-noticias}
+      - CloudflareR2__BucketName=${R2_BUCKET_NAME:-financehorizon}
       - CloudflareR2__PublicDomain=${R2_PUBLIC_DOMAIN:-}
       - Documents__MaxSizeBytes=${DOCUMENTS_MAX_SIZE_BYTES:-26214400}
       - Documents__LocalPath=${DOCUMENTS_LOCAL_PATH:-/app/storage/documents}
     volumes:
       # Persistencia de imágenes y documentos cuando se usa almacenamiento local.
-      # En el VPS los documentos viven en /opt/portal-noticias/documents.
+      # En el VPS los documentos viven en /opt/financehorizon/documents.
       # Para desarrollo local se puede sobrescribir con DOCUMENTS_HOST_PATH=./storage/documents
       - ./uploads:/app/wwwroot/uploads
-      - ${DOCUMENTS_HOST_PATH:-/opt/portal-noticias/documents}:/app/storage/documents
+      - ${DOCUMENTS_HOST_PATH:-/opt/financehorizon/documents}:/app/storage/documents
     networks:
       - app_network
 
 networks:
   app_network:
-    name: portal_network
+    name: financehorizon_network
     driver: bridge

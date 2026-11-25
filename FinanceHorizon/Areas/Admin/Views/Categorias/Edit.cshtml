@@ -1,0 +1,11 @@
+@model FinanceHorizon.Areas.Admin.Models.CategoryFormViewModel
+@{
+    ViewData["Title"] = "Editar Categoría";
+    ViewData["IsEdit"] = true;
+}
+
+<partial name="_CategoryForm" model="Model" />
+
+@section Scripts {
+    <partial name="_CategoryFormScripts" model="Model" />
+}

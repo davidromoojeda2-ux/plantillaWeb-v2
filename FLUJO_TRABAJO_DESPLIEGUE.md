@@ -1,10 +1,10 @@
 # Flujo de trabajo completo: desarrollo, GitHub y despliegue
 
-**Repositorio:** `https://github.com/davidromoojeda2-ux/plantillaWeb.git`  
+**Repositorio:** `https://github.com/davidromoojeda2-ux/plantillaWeb-v2.git`  
 **Worktree de referencia:** `C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo`  
 **Rama de referencia (ya fusionada):** `proyecto-en-desarrollo`  
 **Rama para nuevas tareas:** `feature/mi-nueva-tarea` desde `origin/main`  
-**Worktree principal:** `D:\proyecto-Web1\paginaWeb` (rama `main`)  
+**Worktree principal:** `D:\proyecto-Web1\FinanceHorizon` (rama `main`)  
 **Fecha de referencia:** 28/10/2026
 
 > Este documento describe el flujo completo: preparación local, ramas, Pull Request, GitHub Actions, publicación de la imagen en GHCR y despliegue en el VPS.  
@@ -30,7 +30,7 @@ Merge del PR a main
       │
       ├── GitHub Actions: validate-code
       ├── GitHub Actions: build-and-push
-      │        └── Imagen en GHCR: ghcr.io/davidromoojeda2-ux/plantillaweb:latest
+      │        └── Imagen en GHCR: ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
       └── GitHub Actions: deploy
                ├── Opción A: webhook de Dokploy
                └── Opción B: SSH + docker compose en el VPS
@@ -105,14 +105,14 @@ Si no instalas `gh`, todo el flujo se puede completar desde la web de GitHub.
 ### 3.1. Clonar el repositorio en una máquina nueva
 
 ```powershell
-git clone https://github.com/davidromoojeda2-ux/plantillaWeb.git "D:\proyecto-Web1\paginaWeb"
-cd "D:\proyecto-Web1\paginaWeb"
+git clone https://github.com/davidromoojeda2-ux/plantillaWeb-v2.git "D:\proyecto-Web1\FinanceHorizon"
+cd "D:\proyecto-Web1\FinanceHorizon"
 ```
 
 Si el repositorio ya existe, entra al worktree principal:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git remote -v
 git status
 ```
@@ -127,11 +127,11 @@ git config --global user.email "tu-correo@ejemplo.com"
 ### 3.2. Estructura relevante
 
 ```text
-paginaWeb/
+FinanceHorizon/
 ├── Aplication/
 ├── Domine/
 ├── Infrastructure/
-├── paginaWeb/                 # Proyecto web ASP.NET Core
+├── FinanceHorizon/                 # Proyecto web ASP.NET Core
 │   ├── Styles/tailwind.css
 │   ├── wwwroot/
 │   └── Views/
@@ -144,7 +144,7 @@ paginaWeb/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .env.example
-└── paginaWeb.slnx
+└── FinanceHorizon.slnx
 ```
 
 ### 3.3. Crear el worktree de trabajo
@@ -152,7 +152,7 @@ paginaWeb/
 El worktree principal se queda en `main`. Para trabajar en una rama alterna se puede crear un worktree separado. El worktree de este repositorio ya existe; el siguiente comando es el que se usó para crearlo y sirve como referencia:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git fetch origin --prune
 git worktree add -b proyecto-en-desarrollo "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo" origin/main
 ```
@@ -192,7 +192,7 @@ git worktree prune
 
 ### 3.4. Abrir el worktree correcto en el IDE
 
-La terminal y el IDE son contextos distintos. Si la terminal está en `...\proyecto en desarrollo` pero el IDE muestra `paginaWeb main`, el workspace abierto sigue siendo el worktree principal `D:\proyecto-Web1\paginaWeb`.
+La terminal y el IDE son contextos distintos. Si la terminal está en `...\proyecto en desarrollo` pero el IDE muestra `FinanceHorizon main`, el workspace abierto sigue siendo el worktree principal `D:\proyecto-Web1\FinanceHorizon`.
 
 Abrir la carpeta correcta en el IDE:
 
@@ -224,7 +224,7 @@ proyecto-en-desarrollo
 Y en `git worktree list`:
 
 ```text
-D:/proyecto-Web1/paginaWeb                                                  6b896dd [main]
+D:/proyecto-Web1/FinanceHorizon                                                  6b896dd [main]
 C:/Users/GAMER/.local/share/opencode/worktree/994c49/proyecto en desarrollo 257fef8 [proyecto-en-desarrollo]
 ```
 
@@ -240,7 +240,7 @@ C:/Users/GAMER/.local/share/opencode/worktree/994c49/proyecto en desarrollo 257f
 
 ```powershell
 cd "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo"
-dotnet restore paginaWeb.slnx
+dotnet restore FinanceHorizon.slnx
 ```
 
 ### 4.2. Configurar secretos locales con User Secrets
@@ -248,30 +248,30 @@ dotnet restore paginaWeb.slnx
 Los secretos locales no se suben al repositorio.
 
 ```powershell
-dotnet user-secrets set "MongoDB:ConnectionString" "mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/portal_noticias?retryWrites=true&w=majority" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "MongoDB:DatabaseName" "portal_noticias" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets set "MongoDB:ConnectionString" "mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/financehorizon?retryWrites=true&w=majority" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "MongoDB:DatabaseName" "financehorizon" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 Si usas Cloudflare R2:
 
 ```powershell
-dotnet user-secrets set "CloudflareR2:AccountId" "TU_ACCOUNT_ID" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:AccessKeyId" "TU_ACCESS_KEY" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:SecretAccessKey" "TU_SECRET_KEY" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:BucketName" "portal-noticias" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:PublicDomain" "https://pub-tu-dominio.r2.dev" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets set "CloudflareR2:AccountId" "TU_ACCOUNT_ID" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:AccessKeyId" "TU_ACCESS_KEY" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:SecretAccessKey" "TU_SECRET_KEY" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:BucketName" "financehorizon" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:PublicDomain" "https://pub-tu-dominio.r2.dev" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 Verificar secretos configurados:
 
 ```powershell
-dotnet user-secrets list --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets list --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### 4.3. Instalar dependencias frontend y compilar Tailwind CSS
 
 ```powershell
-cd "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo\paginaWeb"
+cd "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo\FinanceHorizon"
 pnpm install --frozen-lockfile
 pnpm run build:css
 ```
@@ -286,7 +286,7 @@ pnpm run watch:css
 
 ```powershell
 cd "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo"
-dotnet build paginaWeb.slnx -c Release --no-restore -p:SkipTailwind=true
+dotnet build FinanceHorizon.slnx -c Release --no-restore -p:SkipTailwind=true
 ```
 
 ### 4.5. Ejecutar pruebas
@@ -301,13 +301,13 @@ dotnet test tests/ContenidoBloques.Tests/ContenidoBloques.Tests.csproj -c Releas
 
 ```powershell
 cd "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo"
-dotnet run --project paginaWeb/paginaWeb.csproj
+dotnet run --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 Con recarga automática:
 
 ```powershell
-dotnet watch --project paginaWeb/paginaWeb.csproj
+dotnet watch --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 Abrir en el navegador la URL que indique la consola, normalmente:
@@ -346,12 +346,12 @@ Qué hace:
 Si prefieres una carpeta separada para cada tarea, crea otro worktree desde el worktree principal:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git fetch origin --prune
 git worktree add -b feature/mi-nueva-tarea "C:\ruta\worktrees\feature-mi-nueva-tarea" origin/main
 ```
 
-> No uses `git switch main` dentro del worktree alterno: `main` ya está abierto en `D:\proyecto-Web1\paginaWeb` y Git lo impedirá.  
+> No uses `git switch main` dentro del worktree alterno: `main` ya está abierto en `D:\proyecto-Web1\FinanceHorizon` y Git lo impedirá.  
 > Si tienes cambios sin commit, commitéalos o guárdalos con `git stash` antes de cambiar de rama.  
 > Si la rama ya existe, usa `git switch feature/mi-nueva-tarea` en lugar de `git switch -c`.  
 > Para actualizar una rama existente con los cambios de `main`, usa `git merge origin/main` o `git rebase origin/main`.
@@ -438,13 +438,13 @@ git ls-remote --heads origin
 Desde la web:
 
 ```text
-https://github.com/davidromoojeda2-ux/plantillaWeb/pull/new/feature/mi-nueva-tarea
+https://github.com/davidromoojeda2-ux/plantillaWeb-v2/pull/new/feature/mi-nueva-tarea
 ```
 
 O comparar contra `main`:
 
 ```text
-https://github.com/davidromoojeda2-ux/plantillaWeb/compare/main...feature/mi-nueva-tarea?expand=1
+https://github.com/davidromoojeda2-ux/plantillaWeb-v2/compare/main...feature/mi-nueva-tarea?expand=1
 ```
 
 Con GitHub CLI, si está instalado:
@@ -476,7 +476,7 @@ gh pr merge --merge
 También puedes integrar sin PR desde el worktree principal. Es el flujo que se usó para fusionar `proyecto-en-desarrollo`:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git switch main
 git fetch origin --prune
 git pull --ff-only origin main
@@ -494,12 +494,12 @@ git push origin main
 
 > `--no-ff` crea un commit de merge y conserva el historial de la rama.  
 > El `git push origin main` es el que dispara GitHub Actions, la imagen Docker y el despliegue.  
-> No ejecutes `git switch main` dentro del worktree alterno: hazlo en `D:\proyecto-Web1\paginaWeb`.
+> No ejecutes `git switch main` dentro del worktree alterno: hazlo en `D:\proyecto-Web1\FinanceHorizon`.
 
 ### 5.8. Actualizar `main` después del merge
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git switch main
 git pull --ff-only origin main
 git log --oneline -5
@@ -512,7 +512,7 @@ Si vas a reutilizar el worktree de desarrollo, **no lo elimines**. Basta con cam
 Primero salir del worktree y eliminarlo:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git worktree remove "C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo"
 ```
 
@@ -594,8 +594,8 @@ Se ejecuta en `ubuntu-latest` y hace:
 ```text
 pnpm install --frozen-lockfile
 pnpm run build:css
-dotnet restore paginaWeb.slnx
-dotnet build paginaWeb.slnx -c Release --no-restore -p:SkipTailwind=true
+dotnet restore FinanceHorizon.slnx
+dotnet build FinanceHorizon.slnx -c Release --no-restore -p:SkipTailwind=true
 ```
 
 ### 7.3. Job `build-and-push`
@@ -618,8 +618,8 @@ Hace:
 Imagen resultante:
 
 ```text
-ghcr.io/davidromoojeda2-ux/plantillaweb:latest
-ghcr.io/davidromoojeda2-ux/plantillaweb:sha-<commit-corto>
+ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
+ghcr.io/davidromoojeda2-ux/plantillaweb-v2:sha-<commit-corto>
 ```
 
 ### 7.4. Job `deploy`
@@ -627,14 +627,14 @@ ghcr.io/davidromoojeda2-ux/plantillaweb:sha-<commit-corto>
 Solo se ejecuta en `main`. Tiene dos modos:
 
 1. **Dokploy:** si existe el secreto `DOKPLOY_WEBHOOK_URL`, llama al webhook.
-2. **SSH directo:** si no hay webhook y existe `SSH_HOST`, copia `docker-compose.yml` y `.env.example` a `/opt/portal-noticias`, descarga la imagen, levanta los contenedores y ejecuta un smoke test.
+2. **SSH directo:** si no hay webhook y existe `SSH_HOST`, copia `docker-compose.yml` y `.env.example` a `/opt/financehorizon`, descarga la imagen, levanta los contenedores y ejecuta un smoke test.
 
 Si no configuras ninguno de los dos, el job puede terminar en verde sin desplegar nada. Configura al menos una opción.
 
 ### 7.5. Ver el workflow en GitHub
 
 ```text
-https://github.com/davidromoojeda2-ux/plantillaWeb/actions/workflows/deploy.yml
+https://github.com/davidromoojeda2-ux/plantillaWeb-v2/actions/workflows/deploy.yml
 ```
 
 Con GitHub CLI, si está instalado:
@@ -671,7 +671,7 @@ gh run list --workflow=deploy.yml --limit 5
 Ruta web:
 
 ```text
-https://github.com/davidromoojeda2-ux/plantillaWeb/settings/secrets/actions
+https://github.com/davidromoojeda2-ux/plantillaWeb-v2/settings/secrets/actions
 ```
 
 ### 8.1. Secretos necesarios
@@ -713,7 +713,7 @@ gh secret list
 En local:
 
 ```powershell
-ssh-keygen -t ed25519 -C "github-actions-plantillaweb" -f "$HOME\.ssh\gh_actions_deploy"
+ssh-keygen -t ed25519 -C "github-actions-plantillaweb-v2" -f "$HOME\.ssh\gh_actions_deploy"
 ```
 
 Copiar la clave pública al VPS:
@@ -775,7 +775,7 @@ Crear la cuenta de administrador.
 5. Imagen Docker:
 
 ```text
-ghcr.io/davidromoojeda2-ux/plantillaweb:latest
+ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
 ```
 
 6. Puerto del contenedor:
@@ -789,7 +789,7 @@ ghcr.io/davidromoojeda2-ux/plantillaweb:latest
 **Opción A: paquete público**
 
 1. GitHub → tu perfil → **Packages**.
-2. Abrir el paquete `plantillaweb`.
+2. Abrir el paquete `plantillaweb-v2`.
 3. **Package settings** → **Change package visibility** → **Public**.
 
 **Opción B: paquete privado**
@@ -819,7 +819,7 @@ ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://+:8080
 
 MongoDB__ConnectionString=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/?retryWrites=true&w=majority
-MongoDB__DatabaseName=portal_noticias
+MongoDB__DatabaseName=financehorizon
 
 Storage__Provider=Local
 LocalStorage__BaseUrl=/uploads
@@ -838,7 +838,7 @@ El backend (`ImageService.cs`) cuenta con detección automática y contingencia 
 > CloudflareR2__AccountId=<account-id>
 > CloudflareR2__AccessKeyId=<access-key>
 > CloudflareR2__SecretAccessKey=<secret-key>
-> CloudflareR2__BucketName=portal-noticias
+> CloudflareR2__BucketName=financehorizon
 > CloudflareR2__PublicDomain=https://pub-tu-dominio.r2.dev
 > ```
 
@@ -851,15 +851,15 @@ Si utilizas almacenamiento en el servidor (opción por defecto):
 #### 1. Crear la carpeta y asignar permisos en el VPS (SSH)
 Antes de mapear en Dokploy, crea la carpeta en el disco del servidor para evitar problemas de permisos:
 ```bash
-sudo mkdir -p /opt/portal-noticias/uploads
-sudo chown -R $USER:$USER /opt/portal-noticias/uploads
-sudo chmod -R 775 /opt/portal-noticias/uploads
+sudo mkdir -p /opt/financehorizon/uploads
+sudo chown -R $USER:$USER /opt/financehorizon/uploads
+sudo chmod -R 775 /opt/financehorizon/uploads
 ```
 
 #### 2. Configurar el volumen en Dokploy
 1. En el servicio `web`, entrar a la pestaña **Volumes**.
 2. Añadir un volumen (*Bind Mount*):
-   * **Host Path:** `/opt/portal-noticias/uploads`  
+   * **Host Path:** `/opt/financehorizon/uploads`  
      *(Es la carpeta física real en el disco duro del VPS. Como los contenedores Docker son efímeros y se destruyen en cada despliegue, esta ruta garantiza que las fotos **nunca se pierdan** al actualizar la aplicación).*
    * **Mount Path:** `/app/wwwroot/uploads`  
      *(Es la ruta interna del contenedor donde ASP.NET Core maneja los estáticos de `wwwroot`. Dokploy crea un puente directo: todo lo que .NET escribe aquí se guarda en el Host Path del VPS).*
@@ -871,7 +871,7 @@ El servicio `ImageService.cs` optimiza cada imagen subida:
 * **Variantes responsivas:** Genera resoluciones automáticas de 400px (móvil), 800px (tablet) y 1600px (desktop).
 * **Estructura en disco:**
   ```text
-  /opt/portal-noticias/uploads/
+  /opt/financehorizon/uploads/
   └── images/
       └── {AÑO}/
           └── {MES}/
@@ -880,7 +880,7 @@ El servicio `ImageService.cs` optimiza cada imagen subida:
               └── {nombre-limpio}-{hash8}-1600.webp
   ```
 * **Acceso público:** Gracias a `LocalStorage__BaseUrl=/uploads`, las fotos quedan disponibles en la web bajo la URL:  
-  `https://tu-dominio.com/uploads/images/{AÑO}/{MES}/{archivo}.webp`
+  `https://financehorizon.tech/uploads/images/{AÑO}/{MES}/{archivo}.webp`
 
 ### 9.6. Dominio y HTTPS
 
@@ -888,7 +888,7 @@ El servicio `ImageService.cs` optimiza cada imagen subida:
    - Host: `@` o `noticias`
    - Valor: IP pública del VPS
 2. En Dokploy, pestaña **Domains**:
-   - Host: `tu-dominio.com`
+   - Host: `financehorizon.tech`
    - Path: `/`
    - Container Port: `8080`
    - Certificate: `Let's Encrypt`
@@ -927,7 +927,7 @@ Después del merge, el flujo automático es:
 push a main
   → validate-code
   → build-and-push
-  → GHCR: ghcr.io/davidromoojeda2-ux/plantillaweb:latest
+  → GHCR: ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
   → webhook Dokploy
   → docker pull + restart
   → smoke test
@@ -945,7 +945,7 @@ En Dokploy:
 Desde el VPS:
 
 ```bash
-curl -I https://tu-dominio.com/
+curl -I https://financehorizon.tech/
 docker ps
 docker logs --tail=100 <nombre-del-contenedor>
 ```
@@ -977,9 +977,9 @@ docker compose version
 Crear la carpeta de despliegue:
 
 ```bash
-sudo mkdir -p /opt/portal-noticias/uploads
-sudo chown -R "$USER":"$USER" /opt/portal-noticias
-cd /opt/portal-noticias
+sudo mkdir -p /opt/financehorizon/uploads
+sudo chown -R "$USER":"$USER" /opt/financehorizon
+cd /opt/financehorizon
 ```
 
 Crear el archivo `.env`:
@@ -993,17 +993,17 @@ chmod 600 .env
 Contenido mínimo recomendado:
 
 ```env
-DOCKER_IMAGE=ghcr.io/davidromoojeda2-ux/plantillaweb:latest
+DOCKER_IMAGE=ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
 HOST_PORT=5000
 
-MONGO_CONNECTION_STRING=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/portal_noticias?retryWrites=true&w=majority
-MONGO_DB=portal_noticias
+MONGO_CONNECTION_STRING=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/financehorizon?retryWrites=true&w=majority
+MONGO_DB=financehorizon
 
 STORAGE_PROVIDER=Local
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=portal-noticias
+R2_BUCKET_NAME=financehorizon
 R2_PUBLIC_DOMAIN=
 ```
 
@@ -1012,7 +1012,7 @@ R2_PUBLIC_DOMAIN=
 ### 10.2. Probar el despliegue manual en el VPS
 
 ```bash
-cd /opt/portal-noticias
+cd /opt/financehorizon
 docker login ghcr.io -u davidromoojeda2-ux
 docker compose pull web
 docker compose up -d --remove-orphans
@@ -1026,8 +1026,8 @@ docker compose logs --tail=100 web
 Copiar la plantilla:
 
 ```bash
-sudo cp /opt/portal-noticias/deploy/nginx-portal.conf.example /etc/nginx/sites-available/portal-noticias
-sudo nano /etc/nginx/sites-available/portal-noticias
+sudo cp /opt/financehorizon/deploy/nginx-portal.conf.example /etc/nginx/sites-available/financehorizon
+sudo nano /etc/nginx/sites-available/financehorizon
 ```
 
 Ajustar `server_name` y el puerto si cambiaste `HOST_PORT`.
@@ -1035,7 +1035,7 @@ Ajustar `server_name` y el puerto si cambiaste `HOST_PORT`.
 Habilitar el sitio:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/portal-noticias /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/financehorizon /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -1045,7 +1045,7 @@ sudo systemctl reload nginx
 ```bash
 sudo apt update
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d tu-dominio.com -d www.tu-dominio.com
+sudo certbot --nginx -d financehorizon.tech -d www.financehorizon.tech
 ```
 
 Comprobar renovación:
@@ -1060,7 +1060,7 @@ Crear el secreto `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` y, si aplica, `SSH_PO
 
 El workflow se encargará de:
 
-1. Copiar `docker-compose.yml` y `.env.example` a `/opt/portal-noticias`.
+1. Copiar `docker-compose.yml` y `.env.example` a `/opt/financehorizon`.
 2. Crear `.env` si no existe.
 3. Autenticarse en GHCR.
 4. Ejecutar `docker compose pull web`.
@@ -1079,7 +1079,7 @@ El workflow acepta como respuesta válida:
 Si falla, revisa:
 
 ```bash
-cd /opt/portal-noticias
+cd /opt/financehorizon
 docker compose ps
 docker compose logs --tail=100 web
 docker compose config
@@ -1107,19 +1107,19 @@ git switch -c feature/mi-nueva-tarea origin/main
 # 4. Compilar y probar localmente
 git status
 git rev-list --left-right --count origin/main...HEAD
-cd paginaWeb
+cd FinanceHorizon
 pnpm install --frozen-lockfile
 pnpm run build:css
 cd ..
-dotnet restore paginaWeb.slnx
-dotnet build paginaWeb.slnx -c Release --no-restore -p:SkipTailwind=true
+dotnet restore FinanceHorizon.slnx
+dotnet build FinanceHorizon.slnx -c Release --no-restore -p:SkipTailwind=true
 dotnet test tests/ContenidoBloques.Tests/ContenidoBloques.Tests.csproj -c Release
 
 # 5. Publicar la rama
 git push -u origin feature/mi-nueva-tarea
 
 # 6. Crear el PR desde la web
-# https://github.com/davidromoojeda2-ux/plantillaWeb/pull/new/feature/mi-nueva-tarea
+# https://github.com/davidromoojeda2-ux/plantillaWeb-v2/pull/new/feature/mi-nueva-tarea
 ```
 
 ### 11.2. Integrar y desplegar
@@ -1127,7 +1127,7 @@ git push -u origin feature/mi-nueva-tarea
 Si fusionas con un Pull Request, actualiza `main` local después del merge:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git switch main
 git pull --ff-only origin main
 ```
@@ -1135,7 +1135,7 @@ git pull --ff-only origin main
 Si haces el merge localmente sin PR, integra la rama y publica `main`:
 
 ```powershell
-cd "D:\proyecto-Web1\paginaWeb"
+cd "D:\proyecto-Web1\FinanceHorizon"
 git switch main
 git fetch origin --prune
 git pull --ff-only origin main
@@ -1146,7 +1146,7 @@ git push origin main
 Comprobar que el workflow se disparó:
 
 ```text
-https://github.com/davidromoojeda2-ux/plantillaWeb/actions/workflows/deploy.yml
+https://github.com/davidromoojeda2-ux/plantillaWeb-v2/actions/workflows/deploy.yml
 ```
 
 Si usas GitHub CLI:
@@ -1178,7 +1178,7 @@ git worktree list
 git log --oneline --graph --decorate -10
 ```
 
-Si `git rev-parse --show-toplevel` devuelve `D:\proyecto-Web1\paginaWeb`, estás en el worktree principal, no en el worktree de desarrollo. Si el IDE muestra `main` pero la terminal está en `...\proyecto en desarrollo`, el workspace abierto en el IDE es el principal: abre la carpeta del worktree como se explica en el apartado 3.4.
+Si `git rev-parse --show-toplevel` devuelve `D:\proyecto-Web1\FinanceHorizon`, estás en el worktree principal, no en el worktree de desarrollo. Si el IDE muestra `main` pero la terminal está en `...\proyecto en desarrollo`, el workspace abierto en el IDE es el principal: abre la carpeta del worktree como se explica en el apartado 3.4.
 
 ### 12.2. Verificar que la rama está lista para el PR
 
@@ -1197,8 +1197,8 @@ Interpretación:
 ### 12.3. Verificar la imagen en GHCR
 
 ```powershell
-docker pull ghcr.io/davidromoojeda2-ux/plantillaweb:latest
-docker image inspect ghcr.io/davidromoojeda2-ux/plantillaweb:latest
+docker pull ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
+docker image inspect ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest
 ```
 
 En GitHub:
@@ -1219,13 +1219,13 @@ https://github.com/davidromoojeda2-ux?tab=packages
 | Error de conexión a MongoDB | Cadena de conexión o IP no permitida en Atlas | Revisar `MongoDB__ConnectionString` y Network Access |
 | `pnpm install` falla | Lockfile o versión de pnpm distinta | Usar `pnpm@12.11.2` y `--frozen-lockfile` |
 | `dotnet build` falla | SDK incorrecto o CSS no compilado | Instalar .NET 10 y ejecutar `pnpm run build:css` |
-| El IDE muestra `main` aunque la terminal esté en el worktree | El workspace abierto es `D:\proyecto-Web1\paginaWeb` | Abrir la carpeta del worktree (`File → Open Folder...` o `code "C:\...\proyecto en desarrollo"`) |
+| El IDE muestra `main` aunque la terminal esté en el worktree | El workspace abierto es `D:\proyecto-Web1\FinanceHorizon` | Abrir la carpeta del worktree (`File → Open Folder...` o `code "C:\...\proyecto en desarrollo"`) |
 | `git switch main` falla en el worktree alterno | `main` ya está abierta en el worktree principal | No cambies a `main`; crea una rama nueva con `git switch -c feature/... origin/main` |
 
 ### 12.5. Comandos útiles en el VPS
 
 ```bash
-cd /opt/portal-noticias
+cd /opt/financehorizon
 docker compose ps
 docker compose logs -f web
 docker compose pull web
@@ -1244,7 +1244,7 @@ sudo systemctl reload nginx
 - [ ] El worktree está limpio: `git status`.
 - [ ] La rama está actualizada contra `origin/main`: `git rev-list --left-right --count origin/main...HEAD` muestra `0` a la izquierda.
 - [ ] `pnpm run build:css` funciona.
-- [ ] `dotnet build paginaWeb.slnx -c Release --no-restore -p:SkipTailwind=true` funciona.
+- [ ] `dotnet build FinanceHorizon.slnx -c Release --no-restore -p:SkipTailwind=true` funciona.
 - [ ] Las pruebas pasan.
 - [ ] El PR tiene descripción y revisión.
 - [ ] Los secretos de GitHub están configurados si se va a desplegar.
@@ -1259,8 +1259,8 @@ sudo systemctl reload nginx
 
 | Elemento | Valor |
 |---|---|
-| Repositorio | `https://github.com/davidromoojeda2-ux/plantillaWeb.git` |
-| Worktree principal | `D:\proyecto-Web1\paginaWeb` |
+| Repositorio | `https://github.com/davidromoojeda2-ux/plantillaWeb-v2.git` |
+| Worktree principal | `D:\proyecto-Web1\FinanceHorizon` |
 | Rama principal | `main` |
 | Commit de `main` | `6b896dd` |
 | Worktree alterno | `C:\Users\GAMER\.local\share\opencode\worktree\994c49\proyecto en desarrollo` |

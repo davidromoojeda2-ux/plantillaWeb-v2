@@ -1,12 +1,12 @@
 using System.Text.Json;
 using Aplication.DTOs;
-using paginaWeb.Seo;
+using FinanceHorizon.Seo;
 
 namespace Seo.Tests;
 
 public class StructuredDataBuilderTests
 {
-    private const string BaseUrl = "https://unautonomo.com";
+    private const string BaseUrl = "https://financehorizon.tech";
 
     private static ArticleResponseDto CreateArticle() => new()
     {
@@ -38,7 +38,7 @@ public class StructuredDataBuilderTests
         };
 
         var graph = StructuredDataBuilder.BuildNewsArticle(
-            article, cover, category, null, BaseUrl, "unautonomo", "/img/logos/logo.svg", 512, 512);
+            article, cover, category, null, BaseUrl, "financehorizon", "/img/logos/logo.svg", 512, 512);
 
         Assert.Equal("https://schema.org", graph["@context"]);
         Assert.Equal("NewsArticle", graph["@type"]);
@@ -48,7 +48,7 @@ public class StructuredDataBuilderTests
         Assert.Equal("Energía", graph["articleSection"]);
         Assert.Equal("solar, autoconsumo", graph["keywords"]);
         Assert.Equal("PT6M", graph["timeRequired"]);
-        Assert.Equal("https://unautonomo.com/articulos/como-instalar-placas-solares", graph["url"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/articulos/como-instalar-placas-solares", graph["url"]?.ToString());
 
         var images = Assert.IsType<Dictionary<string, object?>[]>(graph["image"]);
         var image = Assert.Single(images);
@@ -60,7 +60,7 @@ public class StructuredDataBuilderTests
         Assert.Equal("Person", author["@type"]?.ToString());
         Assert.Equal("Ana Pérez", author["name"]?.ToString());
         Assert.Equal("https://x.com/anap", author["url"]?.ToString());
-        Assert.Equal("https://unautonomo.com/img/autores/ana.webp", author["image"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/img/autores/ana.webp", author["image"]?.ToString());
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class StructuredDataBuilderTests
         };
 
         var graph = StructuredDataBuilder.BuildNewsArticle(
-            article, cover, null, null, BaseUrl, "unautonomo", null, 0, 0);
+            article, cover, null, null, BaseUrl, "financehorizon", null, 0, 0);
 
         var image = Assert.Single(Assert.IsType<Dictionary<string, object?>[]>(graph["image"]));
         Assert.Equal("https://cdn.example/1600.webp", image["url"]?.ToString());
@@ -99,7 +99,7 @@ public class StructuredDataBuilderTests
         var cover = new ImageMetadataResponseDto { OriginalWidth = 2000, OriginalHeight = 1000 };
 
         var graph = StructuredDataBuilder.BuildNewsArticle(
-            article, cover, null, null, BaseUrl, "unautonomo", null, 0, 0);
+            article, cover, null, null, BaseUrl, "financehorizon", null, 0, 0);
 
         var image = Assert.Single(Assert.IsType<Dictionary<string, object?>[]>(graph["image"]));
         Assert.Equal("https://media.example/original.jpg", image["url"]?.ToString());
@@ -114,11 +114,11 @@ public class StructuredDataBuilderTests
         article.Author = string.Empty;
 
         var graph = StructuredDataBuilder.BuildNewsArticle(
-            article, null, null, null, BaseUrl, "unautonomo", null, 0, 0);
+            article, null, null, null, BaseUrl, "financehorizon", null, 0, 0);
 
         var author = Assert.IsType<Dictionary<string, object?>>(graph["author"]);
         Assert.Equal("Organization", author["@type"]);
-        Assert.Equal("unautonomo", author["name"]);
+        Assert.Equal("financehorizon", author["name"]);
     }
 
     [Fact]
@@ -136,23 +136,23 @@ public class StructuredDataBuilderTests
         var elements = Assert.IsType<List<Dictionary<string, object?>>>(graph["itemListElement"]);
         Assert.Equal(3, elements.Count);
         Assert.Equal(1, Assert.IsType<int>(elements[0]["position"]));
-        Assert.Equal("https://unautonomo.com/", elements[0]["item"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/", elements[0]["item"]?.ToString());
         Assert.Equal(2, Assert.IsType<int>(elements[1]["position"]));
-        Assert.Equal("https://unautonomo.com/categoria/energia", elements[1]["item"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/categoria/energia", elements[1]["item"]?.ToString());
         Assert.False(elements[2].ContainsKey("item"));
     }
 
     [Fact]
     public void BuildWebSite_AddsSearchAction()
     {
-        var graph = StructuredDataBuilder.BuildWebSite(BaseUrl, "unautonomo");
+        var graph = StructuredDataBuilder.BuildWebSite(BaseUrl, "financehorizon");
 
         Assert.Equal("WebSite", graph["@type"]?.ToString());
         var action = Assert.IsType<Dictionary<string, object?>>(graph["potentialAction"]);
         Assert.Equal("SearchAction", action["@type"]?.ToString());
         var target = Assert.IsType<Dictionary<string, object?>>(action["target"]);
         Assert.Equal(
-            "https://unautonomo.com/publicaciones?q={search_term_string}",
+            "https://financehorizon.tech/publicaciones?q={search_term_string}",
             target["urlTemplate"]?.ToString());
         Assert.Equal("required name=search_term_string", action["query-input"]?.ToString());
     }
@@ -162,18 +162,18 @@ public class StructuredDataBuilderTests
     {
         var graph = StructuredDataBuilder.BuildOrganization(
             BaseUrl,
-            "unautonomo",
+            "financehorizon",
             "/img/logos/logo.svg",
             512,
             512,
-            ["https://x.com/unautonomo", "https://x.com/unautonomo", ""]);
+            ["https://x.com/financehorizon", "https://x.com/financehorizon", ""]);
 
         var logo = Assert.IsType<Dictionary<string, object?>>(graph["logo"]);
-        Assert.Equal("https://unautonomo.com/img/logos/logo.svg", logo["url"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/img/logos/logo.svg", logo["url"]?.ToString());
         Assert.Equal(512, Assert.IsType<int>(logo["width"]));
 
         var sameAs = Assert.IsType<List<string>>(graph["sameAs"]);
-        Assert.Equal(new[] { "https://x.com/unautonomo" }, sameAs);
+        Assert.Equal(new[] { "https://x.com/financehorizon" }, sameAs);
     }
 
     [Fact]
@@ -190,14 +190,14 @@ public class StructuredDataBuilderTests
             BaseUrl);
 
         Assert.Equal("CollectionPage", graph["@type"]?.ToString());
-        Assert.Equal("https://unautonomo.com/categoria/energia?page=2", graph["url"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/categoria/energia?page=2", graph["url"]?.ToString());
 
         var itemList = Assert.IsType<Dictionary<string, object?>>(graph["mainEntity"]);
         Assert.Equal("ItemList", itemList["@type"]?.ToString());
         Assert.Equal(2, Assert.IsType<int>(itemList["numberOfItems"]));
 
         var elements = Assert.IsType<List<Dictionary<string, object?>>>(itemList["itemListElement"]);
-        Assert.Equal("https://unautonomo.com/articulos/a", elements[0]["url"]?.ToString());
+        Assert.Equal("https://financehorizon.tech/articulos/a", elements[0]["url"]?.ToString());
         Assert.Equal(2, Assert.IsType<int>(elements[1]["position"]));
     }
 
@@ -218,7 +218,7 @@ public class StructuredDataBuilderTests
     [Fact]
     public void Render_ProducesValidJsonWrappedInScriptTag()
     {
-        var graph = StructuredDataBuilder.BuildWebSite(BaseUrl, "unautonomo");
+        var graph = StructuredDataBuilder.BuildWebSite(BaseUrl, "financehorizon");
         var html = JsonLd.Render(graph).Value ?? string.Empty;
 
         Assert.StartsWith("<script type=\"application/ld+json\">", html);

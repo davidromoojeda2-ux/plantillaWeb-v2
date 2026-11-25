@@ -1,5 +1,5 @@
 using System.Xml.Linq;
-using paginaWeb.Seo;
+using FinanceHorizon.Seo;
 
 namespace ContenidoBloques.Tests;
 

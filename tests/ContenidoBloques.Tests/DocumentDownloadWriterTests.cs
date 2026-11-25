@@ -1,7 +1,7 @@
 using System.Text;
 using Aplication.DTOs;
 using Microsoft.AspNetCore.Http;
-using paginaWeb.Helpers;
+using FinanceHorizon.Helpers;
 
 namespace ContenidoBloques.Tests;
 

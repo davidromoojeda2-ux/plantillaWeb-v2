@@ -50,7 +50,7 @@ public class S3Storage : IImageStorage, IDocumentStorage
         if (!string.IsNullOrWhiteSpace(r2AccountId) && !string.IsNullOrWhiteSpace(r2AccessKey) && !string.IsNullOrWhiteSpace(r2SecretKey))
         {
             _isR2 = true;
-            _bucket = !string.IsNullOrWhiteSpace(r2Bucket) ? r2Bucket : "portal-noticias";
+            _bucket = !string.IsNullOrWhiteSpace(r2Bucket) ? r2Bucket : "financehorizon";
             _publicDomain = (r2PublicDomain ?? string.Empty).TrimEnd('/');
 
             var s3Config = new AmazonS3Config
@@ -66,7 +66,7 @@ public class S3Storage : IImageStorage, IDocumentStorage
         else if (!string.IsNullOrWhiteSpace(s3AccessKey) && !string.IsNullOrWhiteSpace(s3SecretKey))
         {
             _isR2 = false;
-            _bucket = !string.IsNullOrWhiteSpace(s3Bucket) ? s3Bucket : "portal-noticias";
+            _bucket = !string.IsNullOrWhiteSpace(s3Bucket) ? s3Bucket : "financehorizon";
             _publicDomain = (s3PublicDomain ?? string.Empty).TrimEnd('/');
 
             var s3Config = new AmazonS3Config
@@ -90,7 +90,7 @@ public class S3Storage : IImageStorage, IDocumentStorage
         else
         {
             _isConfigured = false;
-            _bucket = "portal-noticias";
+            _bucket = "financehorizon";
             _publicDomain = string.Empty;
             _s3 = null;
             _logger?.LogWarning("Credenciales S3/Cloudflare R2 no configuradas. El servicio operará con almacenamiento local como fallback.");

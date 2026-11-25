@@ -163,7 +163,7 @@ public static class MongoDbIndexer
             var adminUser = new Domine.Entities.AdminUser
             {
                 Username = "admin",
-                Email = "admin@portalnoticias.com",
+                Email = "admin@financehorizon.tech",
                 DisplayName = "Administrador del Sistema",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
                 IsActive = true,

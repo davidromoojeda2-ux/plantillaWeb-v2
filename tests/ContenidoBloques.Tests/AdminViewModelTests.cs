@@ -1,8 +1,8 @@
 using Aplication.DTOs;
 using Aplication.DTOs.ContentBlocks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using paginaWeb.Areas.Admin.Models;
-using paginaWeb.Helpers;
+using FinanceHorizon.Areas.Admin.Models;
+using FinanceHorizon.Helpers;
 
 namespace ContenidoBloques.Tests;
 

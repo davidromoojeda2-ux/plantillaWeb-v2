@@ -7,7 +7,7 @@ Rama: `feat/rediseno-home-ux` · Referencia: prestashop.es (secciones planas, bi
 | Problema | Dónde | Impacto |
 |---|---|---|
 | Degradados y "glows" radiales en el fondo | Hero, slider, paneles, bento | Ruido visual, contraste irregular, aspecto recargado |
-| H1 = nombre de marca ("UNAUTONOMO") | Hero | El H1 no comunica la propuesta de valor; marca duplicada con el navbar |
+| H1 = nombre de marca ("FINANCEHORIZON") | Hero | El H1 no comunica la propuesta de valor; marca duplicada con el navbar |
 | Carrusel autoplay como contenido principal | Hero | Solo se ve la 1.ª diapositiva; el resto pasa desapercibido y distrae |
 | Contenido repetido | Hero + "Últimas entradas" | Los mismos artículos aparecen dos veces |
 | Paneles de colores saturados (amarillo / azul) | Últimas entradas | Compiten con el contenido; jerarquía confusa |

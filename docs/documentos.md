@@ -15,7 +15,7 @@ Límites por defecto:
 - Se rechazan HTML, SVG, JavaScript, ejecutables, scripts y archivos con doble extensión peligrosa.
 - El contenido se valida por firma real (PDF, ZIP/OOXML, OLE, RTF) además de la extensión.
 
-La configuración vive en `paginaWeb/appsettings.json`:
+La configuración vive en `FinanceHorizon/appsettings.json`:
 
 ```json
 "Documents": {
@@ -88,16 +88,16 @@ El contador de descargas se incrementa después de entregar el archivo y nunca b
 
 ```bash
 # Compilar la solución
-dotnet build paginaWeb.slnx
+dotnet build FinanceHorizon.slnx
 
 # Ejecutar todas las pruebas
-dotnet test paginaWeb.slnx
+dotnet test FinanceHorizon.slnx
 
 # Validar la configuración de Docker
 docker compose config
 
 # Recompilar Tailwind si se modificaron estilos
-cd paginaWeb
+cd FinanceHorizon
 pnpm run build:css
 ```
 

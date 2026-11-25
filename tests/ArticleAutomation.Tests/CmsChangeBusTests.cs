@@ -1,7 +1,7 @@
 using Aplication.Realtime;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using paginaWeb.Realtime;
+using FinanceHorizon.Realtime;
 
 namespace ArticleAutomation.Tests;
 
