@@ -1,0 +1,83 @@
+@model (List<CategoryResponseDto> Sections, List<PageResponseDto> Pages, List<SocialProfileDto> SocialProfiles)
+@using Domine.Entities
+@{
+    var footerSections = Model.Sections ?? new();
+    var footerPages = Model.Pages ?? new();
+    var socialProfiles = Model.SocialProfiles ?? new();
+
+    var hasSections = footerSections.Count > 0;
+    var hasPages = footerPages.Count > 0;
+    var secondaryColumns = (hasSections ? 1 : 0) + (hasPages ? 1 : 0);
+
+    // La grilla se ajusta a las columnas que realmente se muestran.
+    var mainClass = secondaryColumns == 0 ? "site-footer__main site-footer__main--single" : "site-footer__main";
+}
+
+<footer class="site-footer" id="acerca-de">
+    <div class="container @mainClass" style="--footer-cols: @secondaryColumns">
+        <!-- Columna Marca -->
+        <div class="site-footer__brand">
+            <a class="site-footer__logo" asp-controller="Home" asp-action="Index" aria-label="@SiteBrand.Name, ir al inicio">
+                <img src="~/img/logos/logo-dark.svg" alt="" width="48" height="48" loading="lazy" decoding="async" />
+                <span class="site-footer__name">@SiteBrand.Name</span>
+            </a>
+            <p class="site-footer__tagline">
+                Guías claras e independientes sobre ahorro, inversión y finanzas personales.
+            </p>
+            @if (socialProfiles.Count > 0)
+            {
+                <div class="social-links">
+                    @foreach (var profile in socialProfiles)
+                    {
+                        <a href="@profile.Url" class="social-link"
+                           aria-label="@SocialNetworks.ProfileLabel(profile.Platform)"
+                           target="_blank" rel="noopener noreferrer">
+                            <partial name="_SocialIcon" model="profile.Platform" />
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Columna Secciones (dinámica: más vistas y con mayor contenido) -->
+        @if (hasSections)
+        {
+            <nav aria-labelledby="footer-secciones">
+                <h2 class="site-footer__heading" id="footer-secciones">Secciones</h2>
+                <ul class="site-footer__list" role="list">
+                    @foreach (var footerSection in footerSections)
+                    {
+                        <li>
+                            <a class="site-footer__link" asp-controller="Category" asp-action="Categoria"
+                               asp-route-slug="@footerSection.Slug">@footerSection.Name</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
+        <!-- Columna Institucional (solo si existen páginas configuradas) -->
+        @if (hasPages)
+        {
+            <nav aria-labelledby="footer-legal">
+                <h2 class="site-footer__heading" id="footer-legal">Legal</h2>
+                <ul class="site-footer__list" role="list">
+                    @foreach (var pageItem in footerPages)
+                    {
+                        <li>
+                            <a class="site-footer__link" asp-controller="Home" asp-action="Info"
+                               asp-route-slug="@pageItem.Slug">@pageItem.Title</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+
+    <!-- Fila Inferior -->
+    <div class="container">
+        <div class="site-footer__bottom">
+            <p>© @DateTime.UtcNow.Year @SiteBrand.Name. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>

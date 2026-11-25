@@ -28,7 +28,7 @@ public class EditorialAuthorsTests
     {
         var author = EditorialAuthors.Resolve(slug);
 
-        Assert.Equal("Grupo de Redactores de unautonomo", author.Name);
+        Assert.Equal("Grupo de Redactores de financehorizon", author.Name);
         Assert.Equal("Equipo editorial", author.Role);
     }
 
@@ -115,7 +115,7 @@ public class EditorialAuthorsTests
         await harness.CreateService().RunOnceAsync(AutomationTrigger.Manual, CancellationToken.None);
 
         Assert.NotNull(created);
-        Assert.Equal("Grupo de Redactores de unautonomo", created!.Author);
+        Assert.Equal("Grupo de Redactores de financehorizon", created!.Author);
         Assert.Equal("Equipo editorial", created.AuthorRole);
         Assert.Equal(EditorialAuthors.EditorialGroup.Bio, created.AuthorBio);
     }

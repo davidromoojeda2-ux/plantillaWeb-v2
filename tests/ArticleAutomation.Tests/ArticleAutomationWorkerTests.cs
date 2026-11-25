@@ -3,7 +3,7 @@ using Domine.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using paginaWeb.Workers;
+using FinanceHorizon.Workers;
 
 namespace ArticleAutomation.Tests;
 

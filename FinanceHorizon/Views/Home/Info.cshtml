@@ -1,0 +1,113 @@
+@model PageResponseDto
+@{
+    ViewData["Title"] = Model.Title;
+    var otherPages = (List<PageResponseDto>?)ViewBag.OtherPages ?? new();
+    var institutionalNavDesktop = new InstitutionalNavViewModel(otherPages, Model.Slug, IsMobile: false);
+    var institutionalNavMobile = new InstitutionalNavViewModel(otherPages, Model.Slug, IsMobile: true);
+    var institutionalHeader = new CollapsibleMenuHeaderViewModel("Información legal");
+}
+
+
+<div class="public-page">
+    <!-- ─── 1. Cabecera Hero de Extremo a Extremo (Full Width) ───────────────── -->
+    <header class="page-hero">
+
+        <div class="container page-hero__inner">
+            <!-- Breadcrumb -->
+            <nav class="page-hero__breadcrumb" aria-label="Migas de pan">
+                <a asp-controller="Home" asp-action="Index">Inicio</a>
+                <span>/</span>
+                <span class="text-white/80">Legal</span>
+                <span>/</span>
+                <span class="page-hero__breadcrumb-current">@Model.Title</span>
+            </nav>
+
+            <div class="page-hero__meta">
+                <span>ACTUALIZACIÓN:</span>
+                <span>@Model.UpdatedAt.ToString("dd MMMM yyyy")</span>
+            </div>
+
+            <h1 class="page-hero__title">
+                @Model.Title
+            </h1>
+
+            <p class="page-hero__subtitle">
+                @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+                {
+                    @Model.Subtitle
+                }
+                else
+                {
+                    <span class="opacity-50 italic">Sin descripción. Edita esta sección desde el panel de administración.</span>
+                }
+            </p>
+        </div>
+    </header>
+
+    <!-- ─── 2. Contenido de Extremo a Extremo (Mismo contenedor de la Home) ─── -->
+    <section class="page-content-section container" aria-label="Contenido">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+            <!-- Menú Lateral Institucional (escritorio) -->
+            <aside class="toc hidden lg:block lg:col-span-4" aria-labelledby="institutionalTitle">
+                <div class="toc__header">
+                    <h2 class="toc__title" id="institutionalTitle">@institutionalHeader.Title</h2>
+                </div>
+                <partial name="Partials/_InstitutionalNav" model="institutionalNavDesktop" />
+            </aside>
+
+            <!-- Menú desplegable Institucional (móvil y tablet) -->
+            <details id="institutionalMenu" class="toc-mobile lg:hidden" open>
+                <summary class="toc-mobile__summary">
+                    <span class="toc__title">@institutionalHeader.Title</span>
+                    <svg class="toc-mobile__chevron" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M0 2l5 6 5-6z" fill="currentColor" /></svg>
+                </summary>
+                <partial name="Partials/_InstitutionalNav" model="institutionalNavMobile" />
+            </details>
+
+            <!-- Contenido Estructurado -->
+            <article class="lg:col-span-8 min-w-0 lg:pl-4">
+                <div class="article-prose max-w-none">
+                    <partial name="Partials/ContentBlocks/_ContentBlocks" model="Model.Blocks" />
+                </div>
+
+                @if (Model.Slug == "politica-de-cookies")
+                {
+                    <div id="preferencias"
+                         class="mt-10 rounded-lg border border-slate-200 bg-slate-50/80 p-6 sm:p-7">
+                        <h2 class="text-lg font-bold text-[#00296B]">Gestionar tus preferencias</h2>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                            Puedes aceptar o rechazar las categorías opcionales en cualquier momento. Tu elección
+                            se guarda durante 12 meses y puedes cambiarla cuando quieras.
+                        </p>
+                        <a href="/info/politica-de-cookies#preferencias"
+                           data-site-preferences
+                           class="hp-btn hp-btn--primary mt-4">
+                            Configurar cookies
+                        </a>
+                    </div>
+                }
+            </article>
+        </div>
+    </section>
+</div>
+
+@section StructuredData {
+    @{
+        var structuredDataBaseUrl = SiteUrl.Resolve(Context, Configuration);
+        var breadcrumb = new List<BreadcrumbItem>
+        {
+            new("Inicio", "/"),
+            new(Model.Title, $"/info/{Model.Slug}")
+        };
+
+        var pageJsonLd = StructuredDataBuilder.BuildWebPage(
+            Model.Title,
+            Model.Subtitle,
+            $"/info/{Model.Slug}",
+            Model.UpdatedAt,
+            structuredDataBaseUrl);
+        var breadcrumbJsonLd = StructuredDataBuilder.BuildBreadcrumbList(breadcrumb, structuredDataBaseUrl);
+    }
+    @JsonLd.Render(pageJsonLd)
+    @JsonLd.Render(breadcrumbJsonLd)
+}

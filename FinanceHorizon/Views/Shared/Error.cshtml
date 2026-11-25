@@ -1,0 +1,29 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="public-page">
+    <header class="page-hero">
+        <div class="container page-hero__inner">
+            <span class="page-hero__meta">Error 500</span>
+            <h1 class="page-hero__title">No se ha podido procesar tu solicitud</h1>
+            <p class="page-hero__subtitle">
+                Ha ocurrido un problema inesperado en el servidor. Vuelve a intentarlo en unos instantes.
+            </p>
+        </div>
+    </header>
+
+    <section class="container hp-section">
+        @if (Model.ShowRequestId)
+        {
+            <p class="hp-meta" style="margin-bottom: 1.5rem">
+                Identificador de la solicitud: <code>@Model.RequestId</code>
+            </p>
+        }
+        <a href="/" class="hp-btn hp-btn--primary">
+            <span>Volver al inicio</span>
+            <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+        </a>
+    </section>
+</div>

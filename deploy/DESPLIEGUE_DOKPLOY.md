@@ -14,7 +14,7 @@ flowchart LR
     subgraph CI["GitHub Actions (Gratuito - 16GB RAM)"]
         B --> C[Validar .NET 10 y Tailwind CSS]
         C --> D[Construir Imagen Docker]
-        D --> E[Publicar en GHCR<br/>ghcr.io/.../plantillaweb:latest]
+        D --> E[Publicar en GHCR<br/>ghcr.io/.../plantillaweb-v2:latest]
     end
 
     subgraph CD["VPS Ligero (Dokploy)"]
@@ -60,9 +60,9 @@ Dentro del proyecto creado:
 2. Asigna un nombre al servicio: `web`
 3. En la configuración del servicio (proveedor: ej. github/docker)
    - **Image Name / Docker Image:**  
-     `ghcr.io/davidromoojeda2-ux/plantillaweb:latest`
+     `ghcr.io/davidromoojeda2-ux/plantillaweb-v2:latest`
 En 
-   - **Domain** agregar: `tu-dominio.com` (En esta sección se pone el dominio)
+   - **Domain** agregar: `financehorizon.tech` (En esta sección se pone el dominio)
    - **Container Port:** `8080`
 
 ### 💡 Acceso a la Imagen en GitHub Container Registry (GHCR)
@@ -71,7 +71,7 @@ Tienes dos alternativas para que Dokploy pueda descargar tu imagen:
 
 #### Alternativa A: Hacer el paquete público en GitHub (Más simple, recomendada Ojo:debe ser creada la imagen para que sea visible en packages y publicarla)
 1. En GitHub, ve a tu perfil ➔ pestaña **"Packages"**.
-2. Haz clic en el paquete **`plantillaweb`**.
+2. Haz clic en el paquete **`plantillaweb-v2`**.
 3. En el menú lateral derecho, entra a **"Package settings"**.
 4. Al final de la página (Danger Zone), pulsa **"Change package visibility"** y cámbialo a **Public**.
 5. *¡Listo! Dokploy podrá descargar la imagen sin configurar usuarios ni contraseñas.*
@@ -94,11 +94,11 @@ ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://+:8080
 
 # ─── URL Pública (robots.txt y sitemap.xml) ───────────────────────────────────
-Site__BaseUrl=https://tu-dominio.com
+Site__BaseUrl=https://financehorizon.tech
 
 # ─── Base de Datos MongoDB Atlas ──────────────────────────────────────────────
 MongoDB__ConnectionString=mongodb+srv://davidromoojeda2_db_user:TU_PASSWORD@cluster0.cqouh1v.mongodb.net/?retryWrites=true&w=majority
-MongoDB__DatabaseName=portal_noticias
+MongoDB__DatabaseName=financehorizon
 
 # ─── Almacenamiento de Archivos ───────────────────────────────────────────────
 # Opciones: Local | CloudflareR2
@@ -109,7 +109,7 @@ LocalStorage__BaseUrl=/uploads
 CloudflareR2__AccountId=
 CloudflareR2__AccessKeyId=
 CloudflareR2__SecretAccessKey=
-CloudflareR2__BucketName=portal-noticias
+CloudflareR2__BucketName=financehorizon
 CloudflareR2__PublicDomain=https://pub-tu-dominio.r2.dev
 ```
 
@@ -123,7 +123,7 @@ Si utilizas almacenamiento `Local` para las imágenes que suban los editores:
 1. En la ficha de tu servicio `web` en Dokploy, ve a la pestaña **"Volumes"**.
 2. Añade un nuevo volumen:
    - **Type:** `Bind Mount` o `Volume`
-   - **Host Path:** `/opt/portal-noticias/uploads` (o el nombre que elijas)
+   - **Host Path:** `/opt/financehorizon/uploads` (o el nombre que elijas)
    - **Mount Path (en el contenedor):** `/app/wwwroot/uploads`
 3. Haz clic en **"Save"**.
 
@@ -138,7 +138,7 @@ Si utilizas almacenamiento `Local` para las imágenes que suban los editores:
      - **Host:** `@` (o un subdominio como `noticias`)
      - **Valor/Destino:** La dirección IP pública de tu VPS.
 2. En Dokploy, entra en la pestaña **"Domains"** del servicio `web`:
-   - **Host:** `tu-dominio.com` (o `noticias.tu-dominio.com`)
+   - **Host:** `financehorizon.tech` (o `noticias.financehorizon.tech`)
    - **Path:** `/`
    - **Container Port:** `8080`
    - **Certificate:** Selecciona **"Let's Encrypt"**

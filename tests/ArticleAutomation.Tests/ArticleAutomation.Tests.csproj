@@ -27,7 +27,7 @@
     <ProjectReference Include="..\..\Domine\Domine.csproj" />
     <ProjectReference Include="..\..\Aplication\Aplication.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\..\paginaWeb\paginaWeb.csproj" />
+    <ProjectReference Include="..\..\FinanceHorizon\FinanceHorizon.csproj" />
   </ItemGroup>
 
 </Project>

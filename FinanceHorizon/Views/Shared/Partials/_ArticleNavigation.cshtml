@@ -1,0 +1,62 @@
+@model (ArticleResponseDto? Previous, ArticleResponseDto? Next, Dictionary<string, ImageMetadataResponseDto>? Images)
+@{
+    if (Model.Previous == null && Model.Next == null)
+    {
+        return;
+    }
+}
+
+@* Navegación entre artículos: enlaces de texto discretos (sistema plano), sin tarjetas ni miniaturas.
+   Los ids nav-prev-article / nav-next-article los usa article.js para las flechas del teclado. *@
+<nav class="article-pager" aria-labelledby="article-pager-title">
+    <div class="article-pager__header">
+        <h2 class="article-pager__title" id="article-pager-title">Sigue leyendo</h2>
+        <span class="article-pager__hint" aria-hidden="true">Usa ← → del teclado</span>
+    </div>
+
+    <div class="article-pager__grid">
+        @if (Model.Previous != null)
+        {
+            <a id="nav-prev-article" class="article-pager__link"
+               asp-controller="Home" asp-action="Articulo" asp-route-slug="@Model.Previous.Slug"
+               rel="prev" aria-label="Artículo anterior: @Model.Previous.Title">
+                <span class="article-pager__label">
+                    <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M9 0L0 5l9 5z" fill="currentColor" /></svg>
+                    Anterior
+                </span>
+                <span class="article-pager__name">@Model.Previous.Title</span>
+                <span class="article-pager__meta">
+                    @if (Model.Previous.PublishedAt.HasValue)
+                    {
+                        @Model.Previous.PublishedAt.Value.ToString("dd MMM yyyy")<text> · </text>
+                    }
+                    @Model.Previous.ReadingTimeMinutes min de lectura
+                </span>
+            </a>
+        }
+        else
+        {
+            <span aria-hidden="true"></span>
+        }
+
+        @if (Model.Next != null)
+        {
+            <a id="nav-next-article" class="article-pager__link article-pager__link--next"
+               asp-controller="Home" asp-action="Articulo" asp-route-slug="@Model.Next.Slug"
+               rel="next" aria-label="Artículo siguiente: @Model.Next.Title">
+                <span class="article-pager__label">
+                    Siguiente
+                    <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                </span>
+                <span class="article-pager__name">@Model.Next.Title</span>
+                <span class="article-pager__meta">
+                    @if (Model.Next.PublishedAt.HasValue)
+                    {
+                        @Model.Next.PublishedAt.Value.ToString("dd MMM yyyy")<text> · </text>
+                    }
+                    @Model.Next.ReadingTimeMinutes min de lectura
+                </span>
+            </a>
+        }
+    </div>
+</nav>

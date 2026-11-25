@@ -1,6 +1,6 @@
 using Aplication.Configuration;
 using Aplication.DTOs;
-using paginaWeb.Models.Home;
+using FinanceHorizon.Models.Home;
 
 namespace ContenidoBloques.Tests;
 

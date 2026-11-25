@@ -1,0 +1,111 @@
+@model FinanceHorizon.Models.Publicaciones.PublicacionesPageViewModel
+@using FinanceHorizon.Models.Home
+@{
+    var isSearch = Model.IsSearch;
+    ViewData["Title"] = isSearch ? $"Resultados para: '{Model.Query}'" : "Publicaciones";
+    ViewData["MetaDescription"] = isSearch
+        ? $"Resultados de búsqueda para {Model.Query} en el portal."
+        : "Explora todas las publicaciones, noticias, reportajes y coberturas del portal.";
+
+    if (isSearch)
+        ViewData["Robots"] = "noindex, follow";
+}
+
+
+<div class="public-page">
+    <header class="page-hero">
+
+        <div class="container page-hero__inner">
+            <nav class="page-hero__breadcrumb" aria-label="Migas de pan">
+                <a asp-controller="Home" asp-action="Index" class="inline-flex items-center gap-1 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10" />
+                    </svg>
+                    Inicio
+                </a>
+                <span>/</span>
+                <span class="page-hero__breadcrumb-current">Publicaciones</span>
+                @if (isSearch)
+                {
+                    <span>/</span>
+                    <span class="text-white/80">Búsqueda</span>
+                }
+                @if (Model.CurrentPage > 1)
+                {
+                    <span>/</span>
+                    <span>Página @Model.CurrentPage</span>
+                }
+            </nav>
+
+            <h1 class="page-hero__title">
+                @(isSearch ? "Resultados de búsqueda" : "Publicaciones")
+            </h1>
+
+            <p class="page-hero__subtitle">
+                @(isSearch
+                    ? $"Explorando contenidos relacionados con '{Model.Query}' en nuestras áreas temáticas y coberturas."
+                    : "Todo el contenido disponible que tenemos para ti.")
+            </p>
+
+            <partial name="Partials/_SearchBar"
+                     model="new FinanceHorizon.Models.Publicaciones.SearchBarViewModel(Query: Model.Query, TotalCount: Model.TotalCount, ShowCount: true)" />
+        </div>
+    </header>
+
+    <!-- ─── 2. Contenido de Extremo a Extremo (Mismo contenedor de la Home) ─── -->
+    <section class="page-content-section container" aria-label="Contenido">
+        @if (!Model.Items.Any())
+        {
+            <div class="hp-empty">
+                <h2 class="hp-empty__title">Sin resultados</h2>
+                <p class="hp-empty__text">Prueba con otras palabras clave o consulta todas las publicaciones.</p>
+                <a asp-controller="Publicaciones" asp-action="Index" class="hp-btn hp-btn--primary">
+                    <span>Ver todas las publicaciones</span>
+                    <svg class="hp-btn__icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                </a>
+            </div>
+            }
+        else
+            {
+                <ul class="hp-grid hp-grid--3" role="list">
+                    @{
+                        var cardIndex = 0;
+                    }
+                    @foreach (var art in Model.Items)
+                    {
+                        ViewData["PostCardPriority"] = cardIndex++ == 0;
+                        <partial name="Partials/_PostCard" model="art" />
+                    }
+                </ul>
+
+                <!-- ─── Paginación Modular Reutilizable ───────────────────────────── -->
+                <partial name="Partials/_Pagination"
+                         model="PaginationViewModel.ForPublicaciones(Model.CurrentPage, Model.TotalPages, Model.Query)" />
+            }
+        </section>
+    </div>
+
+    @section StructuredData {
+        @{
+            var structuredDataBaseUrl = SiteUrl.Resolve(Context, Configuration);
+            var pageUrl = Model.CurrentPage > 1 ? $"/publicaciones?page={Model.CurrentPage}" : "/publicaciones";
+            var breadcrumb = new List<BreadcrumbItem> { new("Inicio", "/"), new("Publicaciones", "/publicaciones") };
+
+            var breadcrumbJsonLd = StructuredDataBuilder.BuildBreadcrumbList(breadcrumb, structuredDataBaseUrl);
+            var collectionJsonLd = isSearch
+                ? null
+                : StructuredDataBuilder.BuildCollectionPage(
+                    "Publicaciones",
+                    "Explora todas las publicaciones, noticias y coberturas del portal.",
+                    pageUrl,
+                    Model.Items.Select(a => new ArticleListItem(a.Article.Title, $"/articulos/{a.Article.Slug}")),
+                    structuredDataBaseUrl);
+        }
+        @JsonLd.Render(breadcrumbJsonLd)
+        @if (collectionJsonLd is not null)
+        {
+            @JsonLd.Render(collectionJsonLd)
+        }
+    }
+

@@ -1,0 +1,37 @@
+@model object
+@{
+    PostCardViewModel? card = null;
+
+    if (Model is PostCardViewModel p)
+    {
+        card = p;
+    }
+    else if (Model is FinanceHorizon.Models.Category.ArticleCardViewModel art)
+    {
+        var slug = art.Article?.Slug ?? string.Empty;
+        var href = Url.Action("Articulo", "Home", new { slug }) ?? $"/articulos/{slug}";
+        card = PostCardViewModel.FromArticle(art, href: href);
+    }
+    else if (Model is Aplication.DTOs.ArticleResponseDto dto)
+    {
+        var slug = dto.Slug ?? string.Empty;
+        var href = Url.Action("Articulo", "Home", new { slug }) ?? $"/articulos/{slug}";
+        card = PostCardViewModel.FromDto(dto, href: href);
+    }
+
+    if (card == null)
+    {
+        return;
+    }
+}
+
+@if (card.AsGridItem)
+{
+    <li data-reveal>
+        <partial name="Partials/_PostCardMosaic" model="card" />
+    </li>
+}
+else
+{
+    <partial name="Partials/_PostCardMosaic" model="card" />
+}

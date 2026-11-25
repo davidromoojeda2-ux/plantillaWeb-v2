@@ -1,0 +1,30 @@
+@model (List<ArticleResponseDto> Articles, Dictionary<string, ImageMetadataResponseDto> Images, string? CategoryName)
+
+@* "También te puede interesar": misma cabecera de sección y tarjeta (_PostCard) que "Últimas entradas" de la home. *@
+@if (Model.Articles != null && Model.Articles.Any())
+{
+    <section class="hp-related" aria-labelledby="related-title">
+        <header class="hp-section__header">
+            <h2 id="related-title" class="hp-h2">También te puede interesar</h2>
+        </header>
+
+        <ul class="hp-grid hp-grid--3">
+            @foreach (var rec in Model.Articles)
+            {
+                var recImage = rec.CoverImageId != null && Model.Images != null && Model.Images.TryGetValue(rec.CoverImageId, out var ri) ? ri : null;
+                var recUrl = !string.IsNullOrWhiteSpace(rec.CoverImageUrl) ? rec.CoverImageUrl : ImageMapper.GetBestUrl(recImage);
+                var card = PostCardViewModel.FromDto(
+                    rec,
+                    categoryName: Model.CategoryName,
+                    imageUrl: recUrl,
+                    href: Url.Action("Articulo", "Home", new { slug = rec.Slug }),
+                    imageSrcSet: ImageMapper.GetSrcSetForUrl(recImage, recUrl)) with
+                {
+                    ShowExcerpt = false,
+                    ImageSizes = PostCardViewModel.SizesThreeColumns
+                };
+                <partial name="Partials/_PostCard" model="card" />
+            }
+        </ul>
+    </section>
+}

@@ -1,0 +1,149 @@
+using Aplication.Exceptions;
+using Aplication.Services;
+using Domine.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using FinanceHorizon.Areas.Admin.Models;
+using FinanceHorizon.Helpers;
+using FinanceHorizon.Models;
+
+namespace FinanceHorizon.Areas.Admin.Controllers;
+
+[Area("Admin")]
+[Authorize]
+[Route("admin/secciones")]
+public class SeccionesController : Controller
+{
+    private readonly IPageService _pageService;
+
+    public SeccionesController(IPageService pageService)
+    {
+        _pageService = pageService;
+    }
+
+    [HttpGet("")]
+    public async Task<IActionResult> Index(int page = 1)
+    {
+        const int pageSize = 10;
+
+        var pages = await _pageService.GetAllAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(pages.Count / (double)pageSize));
+        var currentPage = Math.Clamp(page, 1, totalPages);
+
+        var pagedPages = pages
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        ViewBag.TotalCount = pages.Count;
+        ViewBag.Pagination = new PaginationViewModel(
+            currentPage,
+            totalPages,
+            "Index",
+            "Secciones",
+            ariaLabel: "Paginación de páginas informativas");
+
+        return View(pagedPages);
+    }
+
+    [HttpGet("nueva")]
+    public IActionResult Create()
+    {
+        return View(new PageFormViewModel { Order = 0, ShowInFooter = true });
+    }
+
+    [HttpPost("nueva")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(PageFormViewModel model)
+    {
+        ContentBlockFormHelper.TryParse(model.BlocksJson, ModelState, out var blocks);
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        try
+        {
+            // El orden no se pide en el formulario: se asigna al final.
+            var pages = await _pageService.GetAllAsync();
+            model.Order = pages.Count == 0 ? 1 : pages.Max(p => p.Order) + 1;
+
+            await _pageService.CreateAsync(model.ToDto(blocks));
+            TempData["Success"] = "Página informativa creada correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainValidationException ex)
+        {
+            ModelState.AddModelError(ex.PropertyName ?? string.Empty, ex.Message);
+            return View(model);
+        }
+        catch (ConflictException ex)
+        {
+            ModelState.AddModelError(ex.PropertyName ?? string.Empty, ex.Message);
+            return View(model);
+        }
+    }
+
+    [HttpGet("editar/{id}")]
+    public async Task<IActionResult> Edit(string id)
+    {
+        var page = await _pageService.GetByIdAsync(id);
+        if (page is null) return NotFound();
+
+        var model = PageFormViewModel.FromDto(page);
+
+        ViewBag.PageId = id;
+        return View(model);
+    }
+
+    [HttpPost("editar/{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(string id, PageFormViewModel model)
+    {
+        ContentBlockFormHelper.TryParse(model.BlocksJson, ModelState, out var blocks);
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.PageId = id;
+            return View(model);
+        }
+
+        try
+        {
+            await _pageService.UpdateAsync(id, model.ToDto(blocks));
+            TempData["Success"] = "Página informativa actualizada.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainValidationException ex)
+        {
+            ModelState.AddModelError(ex.PropertyName ?? string.Empty, ex.Message);
+            ViewBag.PageId = id;
+            return View(model);
+        }
+        catch (ConflictException ex)
+        {
+            ModelState.AddModelError(ex.PropertyName ?? string.Empty, ex.Message);
+            ViewBag.PageId = id;
+            return View(model);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("eliminar/{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string id)
+    {
+        try
+        {
+            await _pageService.DeleteAsync(id);
+            TempData["Success"] = "Página informativa eliminada.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+}

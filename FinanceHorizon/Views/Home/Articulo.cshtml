@@ -1,0 +1,278 @@
+@model ArticleResponseDto
+@inject Aplication.Services.ISiteSettingsService SiteSettingsService
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["MetaDescription"] = Model.Summary;
+    var comments = (List<CommentResponseDto>?)ViewBag.Comments ?? new();
+    var category = (CategoryResponseDto?)ViewBag.Category;
+    var subcategory = (CategoryResponseDto?)ViewBag.Subcategory;
+    var coverImage = (ImageMetadataResponseDto?)ViewBag.CoverImage;
+    var coverUrl = !string.IsNullOrWhiteSpace(Model.CoverImageUrl) ? Model.CoverImageUrl :
+ImageMapper.GetBestUrl(coverImage);
+    var coverSrcSet = ImageMapper.GetSrcSetForUrl(coverImage, coverUrl);
+    ViewData["OgImage"] = coverUrl;
+    var recommended = (List<ArticleResponseDto>?)ViewBag.RecommendedArticles ?? new();
+    var recommendedImages = (Dictionary<string, ImageMetadataResponseDto>?)ViewBag.RecommendedImages ?? new();
+    var previousArticle = (ArticleResponseDto?)ViewBag.PreviousArticle;
+    var nextArticle = (ArticleResponseDto?)ViewBag.NextArticle;
+    var adjacentImages = (Dictionary<string, ImageMetadataResponseDto>?)ViewBag.AdjacentImages ?? new();
+    var pageUrl = $"{Context.Request.Scheme}://{Context.Request.Host}/articulos/{Model.Slug}";
+    var badgeCategory = subcategory ?? category;
+    var shareNetworks = (await SiteSettingsService.GetAsync()).EnabledShareNetworks;
+    var tocHeader = new CollapsibleMenuHeaderViewModel("En esta página");
+    var documents = (List<DocumentResponseDto>?)ViewBag.Documents ?? new();
+}
+
+
+<!-- ─── Barra de Progreso de Lectura ──────────────────────────────────────── -->
+<div id="readingProgress"
+     class="fixed top-0 left-0 h-1 bg-[#FDC500] z-50 w-0 transition-all duration-75"></div>
+
+<!-- ─── Toast de copia de enlace ─────────────────────────────────────────── -->
+<div id="copyToast"
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all duration-300"
+     role="status" aria-live="polite">
+    <div class="flex items-center gap-2.5 bg-[#00296B] text-white text-sm font-semibold pl-3 pr-5 py-2.5 rounded-sm">
+        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-[#FDC500] text-[#00296B]">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+        </span>
+        <span>Enlace copiado al portapapeles</span>
+    </div>
+</div>
+
+<article class="public-page article-page">
+    <!-- ─── Cabecera navy (mismo sistema que categorías y políticas) ───────── -->
+    <header class="page-hero article-hero">
+        <div class="container page-hero__inner">
+            <div class="article-hero__top">
+                <nav class="page-hero__breadcrumb" aria-label="Migas de pan">
+                    <a asp-controller="Home" asp-action="Index">Inicio</a>
+                    @if (category != null)
+                    {
+                        <span aria-hidden="true">/</span>
+                        <a asp-controller="Category" asp-action="Categoria" asp-route-slug="@category.Slug">@category.Name</a>
+                    }
+                    @if (subcategory != null)
+                    {
+                        <span aria-hidden="true">/</span>
+                        <a asp-controller="Category" asp-action="Categoria" asp-route-slug="@subcategory.Slug">@subcategory.Name</a>
+                    }
+                    <span aria-hidden="true">/</span>
+                    <span class="page-hero__breadcrumb-current" aria-current="page">Lectura</span>
+                </nav>
+
+                @if (previousArticle != null || nextArticle != null)
+                {
+                    <nav class="article-hero__quicknav" aria-label="Navegación rápida entre artículos">
+                        @if (previousArticle != null)
+                        {
+                            <a id="nav-prev-quick" asp-controller="Home" asp-action="Articulo" asp-route-slug="@previousArticle.Slug"
+                               title="Artículo anterior: @previousArticle.Title" aria-label="Artículo anterior: @previousArticle.Title" rel="prev">
+                                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M9 0L0 5l9 5z" fill="currentColor" /></svg>
+                                <span>Anterior</span>
+                            </a>
+                        }
+                        @if (nextArticle != null)
+                        {
+                            <a id="nav-next-quick" asp-controller="Home" asp-action="Articulo" asp-route-slug="@nextArticle.Slug"
+                               title="Artículo siguiente: @nextArticle.Title" aria-label="Artículo siguiente: @nextArticle.Title" rel="next">
+                                <span>Siguiente</span>
+                                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 0l9 5-9 5z" fill="currentColor" /></svg>
+                            </a>
+                        }
+                    </nav>
+                }
+            </div>
+
+            <div class="article-hero__body">
+                @if (badgeCategory != null)
+                {
+                    <a class="page-hero__meta" asp-controller="Category" asp-action="Categoria" asp-route-slug="@badgeCategory.Slug">@badgeCategory.Name</a>
+                }
+
+                <h1 class="page-hero__title article-hero__title">@Model.Title</h1>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Summary))
+                {
+                    <p class="page-hero__subtitle">@Model.Summary</p>
+                }
+
+                <!-- Autor, fecha y tiempo de lectura -->
+                <div class="article-hero__meta">
+                    <div class="article-hero__author">
+                        @if (!string.IsNullOrWhiteSpace(Model.AuthorAvatarUrl))
+                        {
+                            <img src="@Model.AuthorAvatarUrl" alt="" width="40" height="40" decoding="async" class="article-hero__avatar" />
+                        }
+                        else
+                        {
+                            <span class="article-hero__avatar article-hero__avatar--initial" aria-hidden="true">@(Model.Author.Length > 0 ? Model.Author.Substring(0, 1).ToUpper() : "A")</span>
+                        }
+                        <span>
+                            <span class="article-hero__author-name">@Model.Author</span>
+                            <span class="article-hero__author-role">@(Model.AuthorRole ?? "Redacción Especial")</span>
+                        </span>
+                    </div>
+                    <p class="article-hero__facts">
+                        <time datetime="@Model.PublishedAt?.ToString("yyyy-MM-dd")">@Model.PublishedAt?.ToString("dd MMMM yyyy")</time>
+                        <span aria-hidden="true">·</span>
+                        <span>@Model.ReadingTimeMinutes min de lectura</span>
+                        <span aria-hidden="true">·</span>
+                        <span>@Model.ViewCount lecturas</span>
+                    </p>
+                </div>
+
+                <!-- Compartir: iconos, antes de la imagen -->
+                <partial name="Partials/_SocialShareBar" model="(Url: pageUrl, Title: Model.Title, Networks: (IReadOnlyList<string>)shareNetworks)" />
+            </div>
+        </div>
+    </header>
+
+    <!-- ─── Imagen de portada: completa, sin recorte ───────────────────────── -->
+    @if (!string.IsNullOrWhiteSpace(coverUrl))
+    {
+        <div class="article-cover">
+        <figure class="container article-cover__figure">
+            <img src="@coverUrl" srcset="@coverSrcSet"
+                 sizes="(min-width: 1024px) 1200px, 100vw"
+                 alt="@(!string.IsNullOrWhiteSpace(coverImage?.Alt) ? coverImage.Alt : Model.Title)"
+                 width="@(coverImage?.OriginalWidth > 0 ? coverImage.OriginalWidth : null)"
+                 height="@(coverImage?.OriginalHeight > 0 ? coverImage.OriginalHeight : null)"
+                 loading="eager" fetchpriority="high" decoding="async" />
+        </figure>
+        </div>
+    }
+
+    <div class="container article-page__main">
+
+    <!-- ─── Layout a Dos Columnas de Ancho Completo (Índice Adhesivo + Contenido) ─ -->
+    <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-10 items-start">
+        <!-- Columna Izquierda Adhesiva (Índice "En esta página") -->
+        <aside class="toc hidden lg:block lg:col-span-3" aria-labelledby="tocTitle">
+            <div class="toc__header">
+                <h2 class="toc__title" id="tocTitle">@tocHeader.Title</h2>
+                <span id="tocCounter" class="toc__counter"></span>
+            </div>
+            <nav id="tableOfContents" class="toc__list" aria-label="Índice del artículo">
+                <span class="toc__empty">Cargando secciones...</span>
+            </nav>
+        </aside>
+
+        <!-- Índice plegable para móviles y tablets -->
+        <details id="mobileTocWrapper" class="toc-mobile lg:hidden">
+            <summary class="toc-mobile__summary">
+                <span class="toc__title">@tocHeader.Title</span>
+                <svg class="toc-mobile__chevron" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M0 2l5 6 5-6z" fill="currentColor" /></svg>
+            </summary>
+            <nav id="tableOfContentsMobile" class="toc__list toc__list--mobile" aria-label="Índice del artículo (móvil)">
+                <span class="toc__empty">Cargando secciones...</span>
+            </nav>
+        </details>
+
+        <!-- Columna Derecha (Cuerpo del Artículo + Autor) -->
+        <div class="min-w-0 lg:col-span-9 lg:pl-4">
+            <div class="max-w-4xl mx-auto">
+                <div id="articleBody" class="article-prose max-w-none">
+                    <partial name="Partials/ContentBlocks/_ContentBlocks" model="Model.Blocks" />
+                </div>
+
+                <!-- Tags del Artículo -->
+                @if (Model.Tags.Any())
+                {
+                    <div class="mt-14 pt-8 border-t border-slate-200 flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-[#00296B] mr-2">
+                            <svg class="w-4 h-4 text-[#FDC500]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M7 7h.01M7 3h5a1.99 1.99 0 011.41.59l7 7a2 2 0 010 2.82l-7 7a2 2 0 01-2.82 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            Temas
+                        </span>
+                        @foreach (var tag in Model.Tags)
+                        {
+                            <span class="px-3 py-1 rounded-sm text-xs font-semibold bg-[#00296B]/5 text-[#003F88] border border-[#00296B]/10 hover:bg-[#FDC500] hover:text-[#00296B] hover:border-[#FDC500] transition-colors cursor-default">
+                                #@tag
+                            </span>
+                        }
+                    </div>
+                }
+
+                <partial name="Partials/_ArticleDocuments" model="documents" />
+
+                <!-- ─── Ficha Extendida del Autor (Componente Modular) ───────────── -->
+                <div class="mt-12 pt-8 border-t border-slate-200">
+                    <partial name="Partials/_AuthorBioCard" model="AuthorMapper.ToAuthorDto(Model)" />
+                </div>
+
+                <!-- ─── Navegabilidad entre Artículos (Anterior / Siguiente) ───────── -->
+                <partial name="Partials/_ArticleNavigation"
+                         model="(Previous: previousArticle, Next: nextArticle, Images: adjacentImages)" />
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Sección de Artículos Recomendados (Componente Modular) ─────────── -->
+    <partial name="Partials/_RecommendedArticles"
+             model="(Articles: recommended, Images: recommendedImages, CategoryName: category?.Name)" />
+
+    <!-- ─── Sección de Comentarios y Discusión (Componentes Modulares) ─────── -->
+    <section class="article-comments max-w-3xl mx-auto space-y-8">
+        <div class="flex flex-wrap items-end justify-between gap-3 pb-6 border-b border-slate-100">
+            <div class="space-y-2">
+                
+                <h2 class="text-2xl font-black uppercase tracking-[-0.02em] text-[#00296B] flex items-center gap-3">
+                    Comentarios
+                    <span class="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-sm bg-[#00296B] text-[#FDC500] text-sm font-sans font-bold">@comments.Count</span>
+                </h2>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-slate-50 border border-slate-200 rounded-sm px-3 py-1">
+                <svg class="w-3.5 h-3.5 text-[#00509D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Moderación previa requerida
+            </span>
+        </div>
+
+        <partial name="Partials/_CommentForm" model="(ArticleId: Model.Id, ArticleSlug: Model.Slug)" />
+        <partial name="Partials/_CommentsSection" model="comments" />
+    </section>
+    </div>
+</article>
+
+@section Preloads {
+    @if (!string.IsNullOrWhiteSpace(coverUrl))
+    {
+        <link rel="preload" as="image" href="@coverUrl"
+              imagesrcset="@coverSrcSet"
+              imagesizes="(min-width: 1024px) 1200px, 100vw"
+              fetchpriority="high" />
+    }
+}
+
+@section StructuredData {
+    @{
+        var structuredDataBaseUrl = SiteUrl.Resolve(Context, Configuration);
+        var breadcrumbItems = new List<BreadcrumbItem> { new("Inicio", "/") };
+
+        if (category != null)
+            breadcrumbItems.Add(new(category.Name, $"/categoria/{category.Slug}"));
+        if (subcategory != null)
+            breadcrumbItems.Add(new(subcategory.Name, $"/categoria/{subcategory.Slug}"));
+
+        breadcrumbItems.Add(new(Model.Title, $"/articulos/{Model.Slug}"));
+
+        var articleJsonLd = StructuredDataBuilder.BuildNewsArticle(
+            Model, coverImage, category, subcategory,
+            structuredDataBaseUrl, SiteBrand.Name,
+            SiteBrand.LogoPath, SiteBrand.LogoWidth, SiteBrand.LogoHeight);
+        var breadcrumbJsonLd = StructuredDataBuilder.BuildBreadcrumbList(breadcrumbItems, structuredDataBaseUrl);
+    }
+    @JsonLd.Render(articleJsonLd)
+    @JsonLd.Render(breadcrumbJsonLd)
+}
+
+@section Scripts {
+    <script src="~/js/article.js" asp-append-version="true" defer></script>
+}

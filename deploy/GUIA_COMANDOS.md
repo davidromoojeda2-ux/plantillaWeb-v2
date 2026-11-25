@@ -6,40 +6,40 @@
 
 Los User Secrets permiten guardar cadenas de conexión o claves sensibles en tu máquina de desarrollo sin subirlas al repositorio.
 
-> **Importante:** Ejecuta estos comandos desde la raíz del proyecto o apuntando al proyecto web con `--project paginaWeb/paginaWeb.csproj`.
+> **Importante:** Ejecuta estos comandos desde la raíz del proyecto o apuntando al proyecto web con `--project FinanceHorizon/FinanceHorizon.csproj`.
 
 ### Ver los secretos configurados actualmente
 ```powershell
-dotnet user-secrets list --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets list --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### Configurar la cadena de conexión de MongoDB Atlas
 ```powershell
-dotnet user-secrets set "MongoDB:ConnectionString" "mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/portal_noticias?retryWrites=true&w=majority" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets set "MongoDB:ConnectionString" "mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/financehorizon?retryWrites=true&w=majority" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### Configurar el nombre de la base de datos
 ```powershell
-dotnet user-secrets set "MongoDB:DatabaseName" "portal_noticias" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets set "MongoDB:DatabaseName" "financehorizon" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### Configurar credenciales de Cloudflare R2 (si aplica)
 ```powershell
-dotnet user-secrets set "CloudflareR2:AccountId" "TU_ACCOUNT_ID" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:AccessKeyId" "TU_ACCESS_KEY" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:SecretAccessKey" "TU_SECRET_KEY" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:BucketName" "portal-noticias" --project paginaWeb/paginaWeb.csproj
-dotnet user-secrets set "CloudflareR2:PublicDomain" "https://pub-ejemplo.r2.dev" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets set "CloudflareR2:AccountId" "TU_ACCOUNT_ID" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:AccessKeyId" "TU_ACCESS_KEY" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:SecretAccessKey" "TU_SECRET_KEY" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:BucketName" "financehorizon" --project FinanceHorizon/FinanceHorizon.csproj
+dotnet user-secrets set "CloudflareR2:PublicDomain" "https://pub-ejemplo.r2.dev" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### Borrar un secreto específico
 ```powershell
-dotnet user-secrets remove "MongoDB:ConnectionString" --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets remove "MongoDB:ConnectionString" --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ### Borrar todos los secretos del proyecto
 ```powershell
-dotnet user-secrets clear --project paginaWeb/paginaWeb.csproj
+dotnet user-secrets clear --project FinanceHorizon/FinanceHorizon.csproj
 ```
 
 ---
@@ -230,12 +230,12 @@ OpenSpec organiza el desarrollo guiado por especificaciones. Existen dos formas 
 
 ### B. Comandos en la Terminal / Consola (`openspec ...`)
 > **¿Dónde se usan?:** En tu **terminal (PowerShell / Bash)**.  
-> **Nivel de carpeta:** Siempre en la **raíz del proyecto** (`d:\proyecto-Web1\paginaWeb`), donde se encuentra la carpeta `openspec/` y el archivo de solución `.slnx`.  
+> **Nivel de carpeta:** Siempre en la **raíz del proyecto** (`d:\proyecto-Web1\FinanceHorizon`), donde se encuentra la carpeta `openspec/` y el archivo de solución `.slnx`.  
 > **Función:** Consultar estado, listar cambios o validar manualmente sin pedirle a la IA que modifique archivos.
 
 ```powershell
 # Ubicación requerida: raíz del repositorio
-cd d:\proyecto-Web1\paginaWeb
+cd d:\proyecto-Web1\FinanceHorizon
 
 # Listar todos los cambios activos y archivados
 openspec list

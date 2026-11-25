@@ -1,10 +1,10 @@
-using paginaWeb.Seo;
+using FinanceHorizon.Seo;
 
 namespace Seo.Tests;
 
 public class CanonicalUrlTests
 {
-    private const string BaseUrl = "https://unautonomo.com";
+    private const string BaseUrl = "https://financehorizon.tech";
 
     private static IEnumerable<KeyValuePair<string, string?>> Query(params (string Key, string? Value)[] pairs)
         => pairs.Select(pair => new KeyValuePair<string, string?>(pair.Key, pair.Value));
@@ -14,7 +14,7 @@ public class CanonicalUrlTests
     {
         var url = CanonicalUrl.Build(BaseUrl, "/");
 
-        Assert.Equal("https://unautonomo.com/", url);
+        Assert.Equal("https://financehorizon.tech/", url);
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class CanonicalUrlTests
             "/articulos/placas-solares",
             Query(("utm_source", "x"), ("utm_medium", "social"), ("ref", "home")));
 
-        Assert.Equal("https://unautonomo.com/articulos/placas-solares", url);
+        Assert.Equal("https://financehorizon.tech/articulos/placas-solares", url);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class CanonicalUrlTests
             "/categoria/energia",
             Query(("page", "3"), ("utm_source", "x")));
 
-        Assert.Equal("https://unautonomo.com/categoria/energia?page=3", url);
+        Assert.Equal("https://financehorizon.tech/categoria/energia?page=3", url);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class CanonicalUrlTests
     {
         var url = CanonicalUrl.Build(BaseUrl, "/publicaciones", Query(("page", "1")));
 
-        Assert.Equal("https://unautonomo.com/publicaciones", url);
+        Assert.Equal("https://financehorizon.tech/publicaciones", url);
     }
 
     [Fact]
@@ -55,15 +55,15 @@ public class CanonicalUrlTests
             "/publicaciones",
             Query(("q", "baterías"), ("page", "2")));
 
-        Assert.Equal("https://unautonomo.com/publicaciones?page=2", url);
+        Assert.Equal("https://financehorizon.tech/publicaciones?page=2", url);
     }
 
     [Fact]
     public void Build_TrimsTrailingSlashFromBaseUrlAndNormalizesPath()
     {
-        var url = CanonicalUrl.Build("https://unautonomo.com/", "info/aviso-legal");
+        var url = CanonicalUrl.Build("https://financehorizon.tech/", "info/aviso-legal");
 
-        Assert.Equal("https://unautonomo.com/info/aviso-legal", url);
+        Assert.Equal("https://financehorizon.tech/info/aviso-legal", url);
     }
 
     [Fact]
@@ -75,6 +75,6 @@ public class CanonicalUrlTests
             Query(("orden", "más vistos"), ("page", "2")),
             ["orden"]);
 
-        Assert.Equal("https://unautonomo.com/publicaciones?orden=m%C3%A1s%20vistos", url);
+        Assert.Equal("https://financehorizon.tech/publicaciones?orden=m%C3%A1s%20vistos", url);
     }
 }

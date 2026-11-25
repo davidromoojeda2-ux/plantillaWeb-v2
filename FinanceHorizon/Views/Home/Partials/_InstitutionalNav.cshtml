@@ -1,0 +1,17 @@
+@model InstitutionalNavViewModel
+@{
+    var navClass = Model.IsMobile ? "toc__list toc__list--mobile" : "toc__list";
+    var ariaLabel = Model.IsMobile
+        ? "Información legal (móvil)"
+        : "Información legal";
+}
+
+<nav class="@navClass" aria-label="@ariaLabel">
+    @foreach (var pageItem in Model.Pages)
+    {
+        var isActive = pageItem.Slug == Model.CurrentSlug;
+        <a asp-controller="Home" asp-action="Info" asp-route-slug="@pageItem.Slug"
+           class="toc__link @(isActive ? "is-active" : "")"
+           aria-current="@(isActive ? "page" : null)">@pageItem.Title</a>
+    }
+</nav>

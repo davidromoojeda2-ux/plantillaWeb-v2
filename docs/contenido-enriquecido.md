@@ -42,14 +42,14 @@ Falta únicamente la capa de **datos estructurados JSON-LD**, que se valida con 
 Se sigue el mismo patrón que `SitemapDocumentBuilder`, manteniendo los builders **puros y testables**
 (reciben DTOs y `baseUrl`, sin depender de `HttpContext`):
 
-- `paginaWeb/Seo/StructuredDataBuilder.cs` — builders que devuelven JSON:
+- `FinanceHorizon/Seo/StructuredDataBuilder.cs` — builders que devuelven JSON:
   - `BuildOrganization(siteSettings, baseUrl)`
   - `BuildWebSite(baseUrl)`
   - `BuildNewsArticle(article, coverImage, category, baseUrl)`
   - `BuildBreadcrumbList(items)`
   - `BuildItemList(...)`
-- `paginaWeb/Seo/JsonLd.cs` — utilidad de serialización que **escapa `</` → `<\/`** y devuelve `HtmlString`.
-- `paginaWeb/Views/Shared/_Layout.cshtml` — añadir en el `<head>`:
+- `FinanceHorizon/Seo/JsonLd.cs` — utilidad de serialización que **escapa `</` → `<\/`** y devuelve `HtmlString`.
+- `FinanceHorizon/Views/Shared/_Layout.cshtml` — añadir en el `<head>`:
 
   ```razor
   @await RenderSectionAsync("StructuredData", required: false)
@@ -71,7 +71,7 @@ Reutilización de infraestructura existente:
 
 ### Fase 0 — Base y site-wide
 
-1. Crear `JsonLd.cs` y `StructuredDataBuilder.cs` en `paginaWeb/Seo`.
+1. Crear `JsonLd.cs` y `StructuredDataBuilder.cs` en `FinanceHorizon/Seo`.
 2. En `_Layout.cshtml`, inyectar `Organization` (con `logo`, `sameAs` desde `SocialProfiles`) y
    `WebSite` (con `potentialAction/SearchAction` apuntando a `/publicaciones?q={search_term_string}`).
 3. Tests unitarios de serialización y escape (`StructuredData.Tests`).
@@ -172,10 +172,10 @@ del documento y, en un caso concreto, el orden dentro del `<head>`.
 
 ```bash
 # Compilar la solución
-dotnet build paginaWeb.slnx
+dotnet build FinanceHorizon.slnx
 
 # Ejecutar todas las pruebas
-dotnet test paginaWeb.slnx
+dotnet test FinanceHorizon.slnx
 
 # Validar una URL pública (una vez desplegado)
 # https://search.google.com/test/rich-results
@@ -188,7 +188,7 @@ Implementado en la rama `feature/contenido-enriquecido` (fases 0 a 3):
 
 | Fase | Estado | Dónde |
 | --- | --- | --- |
-| 0 - Base site-wide (`Organization` + `WebSite`) | Hecho | `paginaWeb/Seo/*`, `_Layout.cshtml` |
+| 0 - Base site-wide (`Organization` + `WebSite`) | Hecho | `FinanceHorizon/Seo/*`, `_Layout.cshtml` |
 | 1 - Artículos (`NewsArticle` + `BreadcrumbList`) | Hecho | `Views/Home/Articulo.cshtml` |
 | 2 - Listados (`CollectionPage` + `ItemList` + migas) | Hecho | `Views/Publicaciones/Index.cshtml`, `Views/Category/Categoria.cshtml` |
 | 3 - Informativas (`WebPage` + migas) | Hecho | `Views/Home/Info.cshtml` |
@@ -207,7 +207,7 @@ Notas de implementación:
 
 ## URL canónica
 
-`paginaWeb/Seo/CanonicalUrl.cs` + `<link rel="canonical">` en `_Layout.cshtml`:
+`FinanceHorizon/Seo/CanonicalUrl.cs` + `<link rel="canonical">` en `_Layout.cshtml`:
 
 - Por defecto se usa la ruta actual **sin** parámetros de seguimiento (`utm_*`, `ref`, `q`…) para que
   los enlaces compartidos no generen duplicados.

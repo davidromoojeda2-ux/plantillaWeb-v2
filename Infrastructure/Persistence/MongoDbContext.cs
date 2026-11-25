@@ -20,7 +20,7 @@ public class MongoDbContext
             ? "mongodb://localhost:27017"
             : settings.Value.ConnectionString;
         var dbName = string.IsNullOrWhiteSpace(settings.Value.DatabaseName)
-            ? "portal_noticias"
+            ? "financehorizon"
             : settings.Value.DatabaseName;
 
         var client = new MongoClient(connStr);

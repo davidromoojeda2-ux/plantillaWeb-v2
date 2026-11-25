@@ -34,7 +34,7 @@
 | `Domine/Domine.csproj` | `MongoDB.Driver` v3.13.0 | 🔴 Debe eliminarse |
 | `Aplication/Aplication.csproj` | Ninguna directa (heredada por `Domine`) | 🟡 Hereda el paquete vía referencia |
 | `Infrastructure/Infrastructure.csproj` | `MongoDB.Driver` v3.13.0 | 🟢 Correcto (aquí debe vivir) |
-| `paginaWeb/paginaWeb.csproj` | Ninguna directa | 🟢 Correcto |
+| `FinanceHorizon/FinanceHorizon.csproj` | Ninguna directa | 🟢 Correcto |
 
 ### 2.2 Capa `Domine` (acoplamiento en el dominio)
 
@@ -73,7 +73,7 @@ La validación de IDs de imágenes/documentos asume que todo ID es un ObjectId d
 
 Aquí **debe** quedar MongoDB. Los repositorios (`ArticleRepository`, `CategoryRepository`, `CommentRepository`, `DocumentRepository`, `AutomationStateRepository`, `SiteSettingsRepository`, `OtherRepositories`) usan `MongoDbContext` y `Builders<T>`/`IMongoCollection<T>`. Ya están detrás de interfaces, por lo que **no es necesario tocarlos** salvo para el punto de la sección 6.4.
 
-### 2.5 Arranque (`paginaWeb/Program.cs`)
+### 2.5 Arranque (`FinanceHorizon/Program.cs`)
 
 Registra `MongoDbContext` y ejecuta `MongoDbIndexer.EnsureIndexesAsync`, `MigrateLegacyPageContentAsync` y `EnsureSeedDataAsync`. También `builder.Services.Configure<MongoDbSettings>(...)` en dos puntos (líneas 40-42 y 135-136, duplicado a limpiar).
 
@@ -96,7 +96,7 @@ Dónde debe vivir cada cosa al final:
 | Generación/validación de IDs | `Domine/Common/EntityId.cs` (neutral) |
 | Mapping BSON (class maps / convenciones) | `Infrastructure/Persistence/MongoClassMaps.cs` |
 | Repositorios y consultas | `Infrastructure/Repositories` |
-| Registro DI y arranque | `paginaWeb/Program.cs` (solo orquestación) |
+| Registro DI y arranque | `FinanceHorizon/Program.cs` (solo orquestación) |
 
 ---
 
